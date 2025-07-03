@@ -1,0 +1,36 @@
+<div class="container mt-4">
+  <h2 class="text-center">📋 Booking List</h2>
+
+  <!-- Сообщения -->
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+  <div *ngIf="success" class="alert alert-success">{{ success }}</div>
+
+  <!-- Добавление новой брони -->
+  <form #f="ngForm" (ngSubmit)="addReservation(f)" class="mb-4">
+    <div class="form-row">
+      <input class="form-control mb-2" name="location" [(ngModel)]="reservation.location" placeholder="Location" required />
+      <input class="form-control mb-2" type="datetime-local" name="startTime" [(ngModel)]="reservation.startTime" required />
+      <input class="form-control mb-2" type="datetime-local" name="endTime" [(ngModel)]="reservation.endTime" required />
+      <label class="mr-2">
+        <input type="checkbox" name="complete" [(ngModel)]="reservation.complete" />
+        Complete
+      </label>
+      <button class="btn btn-primary ml-2" type="submit">Add Reservation</button>
+    </div>
+  </form>
+
+  <!-- Список броней -->
+  <div class="card">
+    <div class="card-body">
+      <div *ngFor="let item of reservations" class="border-bottom py-2 d-flex justify-content-between align-items-center">
+        <div><strong>{{ item.location }}</strong></div>
+        <div>{{ item.startTime }}</div>
+        <div>{{ item.endTime }}</div>
+        <div>{{ item.complete ? '✅ Done' : '⏳ Pending' }}</div>
+        <div>
+          <img [src]="'http://localhost/angularapp2/bookingapi/uploads/' + item.imageName" width="50" height="50" class="img-thumbnail" />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
