@@ -29,39 +29,42 @@ export class BookingComponent implements OnInit {
   }
 
   getReservations(): void {
-    this.reservationService.getAll().subscribe(
-      (data: BookingItem[]) => {
-        this.reservations = data;
-        this.success = 'successful list retrieval';
-        console.log('successful list retrieval');
-        console.log(this.reservations);
-        this.cdr.detectChanges();
-      },
-      (err) => {
-        console.log(err);
-        this.error = 'error retrieving reservations';
-      }
-    );
+  this.reservationService.getAll().subscribe(
+    (data: BookingItem[]) => {
+      console.log('Полученные брони:', data);  // <-- добавь эту строку
+      this.reservations = data;
+      this.success = 'successful list retrieval';
+      this.cdr.detectChanges();
+    },
+    (err) => {
+      console.log(err);
+      this.error = 'error retrieving reservations';
+    }
+  );
   }
 
   addReservation(f: NgForm) {
-    if (!this.reservation.location || !this.reservation.startTime || !this.reservation.endTime) {
-      this.error = 'Please fill in all required fields.';
-      return;
-    }
-
-    this.reservationService.add(this.reservation).subscribe(
-      (res) => {
-        this.success = 'Reservation added successfully';
-        this.getReservations();
-        f.resetForm();
-      },
-      (err) => {
-        console.log(err);
-        this.error = 'Failed to add reservation';
-      }
-    );
+  if (!this.reservation.location || !this.reservation.startTime || !this.reservation.endTime) {
+    this.error = 'Please fill in all required fields.';
+    return;
   }
+
+  console.log('Sending reservation:', this.reservation);
+
+  this.reservationService.add(this.reservation).subscribe(
+    (res) => {
+      console.log('Server response:', res);
+      this.success = 'Reservation added successfully';
+      this.getReservations();
+      f.resetForm();
+    },
+    (err) => {
+      console.error('Error adding reservation:', err);
+      this.error = 'Failed to add reservation';
+    }
+  );
+}
+
 
   resetAlerts(): void {
     this.error = '';

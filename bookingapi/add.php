@@ -1,28 +1,35 @@
 <?php
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: Content-Type");
+header("Access-Control-Allow-Methods: POST");
+
 require 'connect.php';
 
-$data = json_decode(file_get_contents("php://input"), true);
+$data = json_decode(file_get_contents("php://input"));
 
-if (!isset($data['data'])) {
-    http_response_code(400);
-    echo json_encode(['error' => 'Invalid input']);
-    exit;
-}
+if (
+    isset($data->location) &&
+    isset($data->startTime) &&
+    isset($data->endTime)
+) {
+    $location = mysqli_real_escape_string($con, $data->location);
+    $startTime = mysqli_real_escape_string($con, $data->startTime);
+    $endTime = mysqli_real_escape_string($con, $data->endTime);
+    $complete = isset($data->complete) ? (int)$data->complete : 0;
+    $imageName = isset($data->imageName) ? mysqli_real_escape_string($con, $data->imageName) : '';
 
-$booking = $data['data'];
-$location = mysqli_real_escape_string($con, $booking['location']);
-$startTime = mysqli_real_escape_string($con, $booking['startTime']);
-$endTime = mysqli_real_escape_string($con, $booking['endTime']);
-$complete = $booking['complete'] ? 1 : 0;
-$imageName = isset($booking['imageName']) ? mysqli_real_escape_string($con, $booking['imageName']) : '';
+    $sql = "INSERT INTO reservations (location, startTime, endTime, complete, imageName)
+            VALUES ('$location', '$startTime', '$endTime', '$complete', '$imageName')";
 
-$sql = "INSERT INTO reservations (location, startTime, endTime, complete, imageName)
-        VALUES ('$location', '$startTime', '$endTime', $complete, '$imageName')";
-
-if (mysqli_query($con, $sql)) {
-    echo json_encode(['data' => 'Reservation added successfully']);
+    if (mysqli_query($con, $sql)) {
+        http_response_code(201);
+        echo json_encode(['message' => 'Reservation added']);
+    } else {
+        http_response_code(500);
+        echo json_encode(['error' => 'Database insert failed']);
+    }
 } else {
-    http_response_code(500);
-    echo json_encode(['error' => 'Failed to add reservation']);
+    http_response_code(400);
+    echo json_encode(['error' => 'Missing required fields']);
 }
 ?>

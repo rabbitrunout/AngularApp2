@@ -19,19 +19,16 @@ export class BookingService {
     }
 
     getAll() {
-        return this.http.get(`${this.baseUrl}/list.php`).pipe(
-            map((res: any) => {
-                return res ['data'];
-            })
-        );
-    }
-    add(reservation: BookingItem ) {
-    return this.http.post(`${this.baseUrl}/add`, {data: reservation}).pipe(
-      map((res: any) => {
-        return res['data'];
-      })
+    return this.http.get(`${this.baseUrl}/list.php`).pipe(
+        map((res: any) => {
+            return res['data'];
+        })
     );
-  }
+}
+  add(reservation: BookingItem) {
+  return this.http.post(`${this.baseUrl}/add.php`, { data: reservation });
+}
+
 
   edit(reservation: BookingItem ) {
     return this.http.put(`${this.baseUrl}/edit`, {data: reservation});

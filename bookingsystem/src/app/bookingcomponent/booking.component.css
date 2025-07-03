@@ -1,84 +1,57 @@
-/* Отступы вокруг контейнера */
 .container {
   max-width: 900px;
 }
 
-/* Стиль заголовка */
 h2 {
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-  color: #343a40;
+  margin-bottom: 20px;
 }
 
-/* Отступы и оформление формы */
-form .form-row {
+.form-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: 10px;
   align-items: center;
 }
 
-/* Немного увеличим ширину чекбокса с подписью */
-form label {
-  display: flex;
-  align-items: center;
-  font-weight: 500;
-  color: #495057;
-  margin-bottom: 0;
-  cursor: pointer;
+.form-control {
+  flex: 1 1 200px;
 }
 
-/* Отступ справа у чекбокса */
-form label input[type="checkbox"] {
-  margin-right: 0.5rem;
-  width: 1.25rem;
-  height: 1.25rem;
+.btn {
+  height: 38px;
+  align-self: flex-end;
 }
 
-/* Кнопка добавления */
-form button {
-  margin-left: auto; /* Отодвинуть кнопку вправо */
-  padding: 0.5rem 1.2rem;
-  font-weight: 600;
-}
-
-/* Карточка списка броней */
 .card {
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-  border-radius: 0.3rem;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgb(0 0 0 / 0.1);
 }
 
-/* Элементы списка */
-.card-body > div {
-  font-size: 1rem;
-  color: #212529;
+.card-body {
+  padding: 15px;
 }
 
-/* Отступы и выравнивание внутри каждого элемента списка */
-.border-bottom.py-2 {
-  gap: 1rem;
+.border-bottom {
+  border-bottom: 1px solid #ddd !important;
 }
 
-/* Изображения в списке */
+.d-flex {
+  display: flex !important;
+}
+
+.justify-content-between {
+  justify-content: space-between !important;
+}
+
+.align-items-center {
+  align-items: center !important;
+}
+
 .img-thumbnail {
-  border-radius: 0.25rem;
+  border-radius: 4px;
   object-fit: cover;
 }
 
-/* Уведомления об ошибках и успехах */
 .alert {
-  font-weight: 600;
-  font-size: 0.95rem;
-}
-
-/* Уменьшаем немного отступы для мобильных */
-@media (max-width: 576px) {
-  form .form-row {
-    flex-direction: column;
-  }
-
-  form button {
-    margin-left: 0;
-    width: 100%;
-  }
+  margin-bottom: 15px;
 }
