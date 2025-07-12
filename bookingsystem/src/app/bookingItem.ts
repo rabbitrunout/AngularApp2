@@ -3,6 +3,6 @@ export interface BookingItem {
   location: string;
   start_time: string;
   end_time: string;
-  imageName?: string;
   complete: boolean;
+  imageName: string;
 }

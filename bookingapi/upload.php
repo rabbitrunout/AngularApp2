@@ -1,32 +1,27 @@
 <?php
+header("Access-Control-Allow-Origin: http://localhost:4200");
+header("Access-Control-Allow-Headers: Content-Type");
+header("Access-Control-Allow-Methods: POST");
+header("Content-Type: application/json");
 
-session_start();
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
 
-header('Content-Type: application/json');
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    error_reporting(E_ALL);
-
-    require 'connevt.php';
-
-
-    // Handle image upload
-  if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
     $uploadDir = 'uploads/';
     $originalFileName = basename($_FILES['image']['name']);
+    $targetFilePath = $uploadDir . $originalFileName;
 
-    // Generate a new file name with "Main"
-    $newFileName = $originalFileName;
-    $targetFilePath = $uploadDir . $newFileName;
-
-    // Save the new image to the uploads directory
     if (move_uploaded_file($_FILES['image']['tmp_name'], $targetFilePath)) {
-      // no code required
+        echo json_encode(['fileName' => $originalFileName]);
     } else {
-      http_response_code(500);
-      echo json_encode(['message' => 'Failed to upload image']);
+        http_response_code(500);
+        echo json_encode(['error' => 'Image upload failed']);
     }
-
-    exit; // Exit after handling image
-  }
+} else {
+    http_response_code(400);
+    echo json_encode(['error' => 'No image uploaded']);
+}
 ?>
