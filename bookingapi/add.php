@@ -1,50 +1,55 @@
-<?php
+    <?php
 
 require 'connect.php';
-$con = connect();
 
 $postdata = file_get_contents("php://input");
 
-if (!$postdata) {
-    http_response_code(400);
-    echo json_encode(['error' => 'No data received']);
-    exit();
-}
+if (isset($postdata) && !empty($postdata)) {
 
-$request = json_decode($postdata);
+    // Декодируем JSON
+    $request = json_decode($postdata);
 
-if (!isset($request->data) ||
-    empty($request->data->location) ||
-    empty($request->data->startTime) ||
-    empty($request->data->endTime)) {
-    http_response_code(400);
-    echo json_encode(['error' => 'Missing required fields']);
-    exit();
-}
+    // Валидация данных
+    if (trim($request->location) === '' || trim($request->start_time) === '' || trim($request->end_time) === '') {
+        http_response_code(400);
+        echo json_encode(['error' => 'Invalid input']);
+        exit;
+    }
 
-$location = mysqli_real_escape_string($con, $request->data->location);
-$start = mysqli_real_escape_string($con, $request->data->startTime);
-$end = mysqli_real_escape_string($con, $request->data->endTime);
-$complete = (int) ($request->data->complete ?? 0);
-$imageName = basename($request->data->imageName ?? 'placeholder.jpg');
+    // Экранируем входные данные
+    $location = mysqli_real_escape_string($con, $request->location);
+    $start_time = mysqli_real_escape_string($con, $request->start_time);
+    $end_time = mysqli_real_escape_string($con, $request->end_time);
+    $complete = isset($request->complete) ? (int)$request->complete : 0;
+    $imageName = isset($request->imageName) ? basename(str_replace('\\', '/', $request->imageName)) : '';
 
-$sql = "INSERT INTO reservations (location, startTime, endTime, complete, imageName)
-        VALUES ('$location', '$start', '$end', $complete, '$imageName')";
+    // Если имя изображения не указано — использовать заглушку
+    if (empty($imageName)) {
+        $imageName = 'placeholder.jpg';
+    }
 
-if (mysqli_query($con, $sql)) {
-    http_response_code(201);
-    echo json_encode([
-        'data' => [
-            'ID' => mysqli_insert_id($con),
+    // SQL-запрос
+    $sql = "INSERT INTO reservations (location, start_time, end_time, complete, image_name)
+            VALUES ('$location', '$start_time', '$end_time', $complete, '$imageName')";
+
+    // Выполнение и возврат ответа
+    if (mysqli_query($con, $sql)) {
+        $id = mysqli_insert_id($con);
+
+        $reservation = [
+            'ID' => $id,
             'location' => $location,
-            'startTime' => $start_time,
-            'endTime' => $end_time,
+            'start_time' => $start_time,
+            'end_time' => $end_time,
             'complete' => $complete,
             'imageName' => $imageName
-        ]
-    ]);
-} else {
-    http_response_code(500);
-    echo json_encode(['error' => mysqli_error($con)]);
+        ];
+
+        http_response_code(201);
+        echo json_encode($reservation);
+    } else {
+        http_response_code(500);
+        echo json_encode(['error' => 'Database insert failed']);
+    }
 }
 ?>

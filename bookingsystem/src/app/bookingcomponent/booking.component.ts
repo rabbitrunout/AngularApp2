@@ -5,12 +5,13 @@ import { BookingItem } from '../bookingItem';
 import { BookingService } from '../booking.service';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { ChangeDetectorRef } from '@angular/core';
+import { RouterModule } from '@angular/router';
 
 
 @Component({
   standalone: true,
   selector: 'app-booking.component',
-  imports: [HttpClientModule, CommonModule, FormsModule],
+  imports: [HttpClientModule, CommonModule, FormsModule, RouterModule],
   providers: [BookingService],
   templateUrl: './booking.component.html',
   styleUrls: ['./booking.component.css'],
@@ -18,12 +19,12 @@ import { ChangeDetectorRef } from '@angular/core';
 export class BookingComponent implements OnInit {
   title = 'ReservationManager';
   public reservations: BookingItem[] = [];
-  reservation: BookingItem = { location: '', startTime: '', endTime: '', complete: false, imageName: '' };
+  reservation: BookingItem = { location: '', start_time: '', end_time: '', complete: false, imageName: '' };
 
-  selectedFile: File | null = null;
+
   error = '';
   success = '';
-  bookingcomponent: any;
+  selectedFile: File | null = null;
 
   constructor(private reservationService: BookingService, private http: HttpClient, private cdr: ChangeDetectorRef) {}
 
@@ -37,6 +38,8 @@ export class BookingComponent implements OnInit {
       // console.log('Полученные брони:', data);  // <-- добавь эту строку
       this.reservations = data;
       this.success = 'successful list retrieval';
+      console.log('successful list retrieval');
+      console.log(this.reservations);
       this.cdr.detectChanges();
     },
     (err) => {
@@ -50,70 +53,73 @@ export class BookingComponent implements OnInit {
   this.resetAlerts();
 
   if (this.selectedFile) {
-    const formData = new FormData();
-    formData.append('image', this.selectedFile);
-
-   this.http.post<any>('http://localhost/angularapp2-1/bookingapi/upload', formData).subscribe(
-      (uploadResponse) => {
-        this.reservation.imageName = this.selectedFile?.name || '';
-
-        // После загрузки — отправляем саму бронь
-        this.createReservation(f);
-      },
-      (error) => {
-        this.error = 'Image upload failed';
-      }
-    );
+    this.reservation.imageName = this.selectedFile.name;
+    this.uploadFile(); // uploads the file
   } else {
-    this.createReservation(f);
+    this.reservation.imageName = ''; // let the backend assign placeholder
   }
-}
 
-createReservation(f: NgForm): void {
   this.reservationService.add(this.reservation).subscribe(
     (res: BookingItem) => {
+      this.reservations.push(res);
       this.success = 'Successfully created';
-      this.getReservations();
-      f.resetForm();
+      f.reset();
+      this.selectedFile = null; // reset file
+    },
+    (err) => (this.error = err.message)
+  );
+}
 
-      // 🧹 Сброс данных формы
-      this.reservation = { location: '', startTime: '', endTime: '', complete: false, imageName: '' };
-      this.selectedFile = null;
+editReservation(location: any, start_time: any, end_time: any, complete: boolean, ID: any) {
+  this.resetAlerts();
+  this.reservationService.edit({
+    location: location.value,
+    start_time: start_time.value,
+    end_time: end_time.value,
+    complete: complete,
+    ID: +ID
+  }).subscribe(
+    (res) => {
+      this.cdr.detectChanges();
+      this.success = 'Successfully edited';
     },
     (err) => {
-      this.error = err.message || 'Error creating reservation';
+      this.error = err.message;
     }
   );
 }
 
-
+deleteReservation(ID: number) {
+  console.log('Delete clicked for ID:', ID); // <-- Add this
+  this.resetAlerts();
+  this.reservationService.delete(ID).subscribe(
+    (res) => {
+      this.reservations = this.reservations.filter(function (item) {
+        return item['ID'] && +item['ID'] !== +ID;
+      });
+      this.cdr.detectChanges();
+      this.success = 'Deleted successfully';
+    },
+    (err) => (this.error = err.message)
+  );
+}
 
   uploadFile(): void {
   if (!this.selectedFile) {
     return;
   }
-
   const formData = new FormData();
   formData.append('image', this.selectedFile);
 
-  this.http.post<any>('http://localhost/angularapp2-1/bookingapi/upload', formData).subscribe(
-    (response) => {
-      console.log('File upload successful:', response);
-      // Добавим имя файла в объект reservation:
-      this.reservation.imageName = this.selectedFile?.name || '';
-    },
-    (error) => {
-      console.error('File upload failed:', error);
-    }
+  this.http.post('http://localhost/angularapp2/bookingsapi/upload', formData).subscribe(
+    response => console.log('File uploaded successfully: ', response),
+    error => console.error('File upload failed: ', error)
   );
 }
 
-
-  onFileSelected(event: Event): void
-  {
+  onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    if(input.files && input.files.length > 0)
-    {
+    if (input.files && input.files.length > 0) {
       this.selectedFile = input.files[0];
     }
   }

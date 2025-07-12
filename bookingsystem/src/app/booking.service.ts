@@ -2,16 +2,17 @@ import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { map, Observable } from "rxjs";
 import { BookingItem } from "./bookingItem";
-import { BookingComponent } from "./bookingcomponent/booking.component";
 
 @Injectable({
   providedIn: 'root'
 })
 export class BookingService {
-  baseUrl = 'http://localhost/angularapp2-1/bookingapi';
+  baseUrl = 'http://localhost/angularapp2/bookingapi';
 
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+
+  }
 
   getAll() {
     return this.http.get(`${this.baseUrl}/list.php`).pipe(
@@ -22,7 +23,7 @@ export class BookingService {
   }
 
   add(reservation: BookingItem) {
-    return this.http.post(`${this.baseUrl}/add.php`, {data: reservation}).pipe(
+    return this.http.post(`${this.baseUrl}/add`,  reservation).pipe(
       map((res: any) => {
         return res['data'];
       })
@@ -30,7 +31,7 @@ export class BookingService {
   }
 
   edit(reservation: BookingItem) {
-    return this.http.put(`${this.baseUrl}/edit`, {data: reservation});
+    return this.http.put(`${this.baseUrl}/edit`,  reservation);
   }
 
   delete(ID: any) {

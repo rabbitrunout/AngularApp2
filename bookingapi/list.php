@@ -1,25 +1,23 @@
 <?php
-header('Access-Control-Allow-Origin: http://localhost:4200'); // ✅ Укажи точно
-
-header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type");
-
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 require 'connect.php';
 
+header('Content-Type: application/json; charset=utf-8');
+mysqli_set_charset($con, 'utf8mb4');
+
 $reservations = [];
-$sql = "SELECT id, location, startTime, endTime, complete, imageName FROM reservations";
+$sql = "SELECT ID, location, start_time, end_time, complete, image_name AS imageName FROM reservations";
 
 if ($result = mysqli_query($con, $sql)) {
     while ($row = mysqli_fetch_assoc($result)) {
         $reservations[] = [
-            'ID' => (int)$row['id'],
+            'ID' => (int)$row['ID'],
             'location' => $row['location'],
-            'startTime' => $row['startTime'],
-            'endTime' => $row['endTime'],
+            'start_time' => $row['start_time'],
+            'end_time' => $row['end_time'],
             'complete' => (bool)$row['complete'],
             'imageName' => $row['imageName']
         ];

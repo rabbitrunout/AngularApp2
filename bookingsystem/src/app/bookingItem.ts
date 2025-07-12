@@ -1,8 +1,8 @@
 export interface BookingItem {
-    ID?: number;
-    location: string;
-    startTime: string;
-    endTime: string;
-    imageName?: string;
-    complete: boolean;
+  ID?: number;
+  location: string;
+  start_time: string;
+  end_time: string;
+  imageName?: string;
+  complete: boolean;
 }

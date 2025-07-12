@@ -25,8 +25,8 @@
         <input
           id="startTime"
           type="datetime-local"
-          name="startTime"
-          [(ngModel)]="reservation.startTime"
+          name="start_time"
+          [(ngModel)]="reservation.start_time"
           class="form-control"
           required
         />
@@ -37,8 +37,8 @@
         <input
           id="endTime"
           type="datetime-local"
-          name="endTime"
-          [(ngModel)]="reservation.endTime"
+          name="end_time"
+          [(ngModel)]="reservation.end_time"
           class="form-control"
           required
         />
@@ -69,8 +69,8 @@
 
       <div *ngFor="let item of reservations" class="border-bottom py-3 d-flex flex-wrap align-items-center justify-content-between">
         <div class="col-md-3 fw-bold">{{ item.location }}</div>
-        <div class="col-md-2 text-muted">{{ item.startTime | date: 'dd.MM.yyyy, HH:mm' }}</div>
-        <div class="col-md-2 text-muted">{{ item.endTime | date: 'dd.MM.yyyy, HH:mm' }}</div>
+        <div class="col-md-2 text-muted">{{ item.start_time | date: 'dd.MM.yyyy, HH:mm' }}</div>
+        <div class="col-md-2 text-muted">{{ item.end_time | date: 'dd.MM.yyyy, HH:mm' }}</div>
         <div class="col-md-2">
           <span [ngClass]="item.complete ? 'text-success' : 'text-warning'">
             {{ item.complete ? '✅ Done' : '⏳ Pending' }}
@@ -78,7 +78,7 @@
         </div>
         <div class="col-md-2" *ngIf="item.imageName">
           <img
-            [src]="'http://localhost/angularapp2-1/bookingapi/uploads/' + item.imageName"
+            [src]="'http://localhost/angularapp2/bookingapi/uploads/' + item.imageName"
             width="50"
             height="50"
             class="img-thumbnail"
