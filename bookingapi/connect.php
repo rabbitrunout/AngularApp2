@@ -1,6 +1,7 @@
 <?php
 
-header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Origin: http://localhost:4200'); // ✅ Укажи точно
+
   // DB credentials
   define('DB_HOST', 'localhost');
   define('DB_USER', 'root');

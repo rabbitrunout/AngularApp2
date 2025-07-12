@@ -1,35 +1,50 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: Content-Type");
-header("Access-Control-Allow-Methods: POST");
 
 require 'connect.php';
+$con = connect();
 
-$data = json_decode(file_get_contents("php://input"));
+$postdata = file_get_contents("php://input");
 
-if (
-    isset($data->location) &&
-    isset($data->startTime) &&
-    isset($data->endTime)
-) {
-    $location = mysqli_real_escape_string($con, $data->location);
-    $startTime = mysqli_real_escape_string($con, $data->startTime);
-    $endTime = mysqli_real_escape_string($con, $data->endTime);
-    $complete = isset($data->complete) ? (int)$data->complete : 0;
-    $imageName = isset($data->imageName) ? mysqli_real_escape_string($con, $data->imageName) : '';
+if (!$postdata) {
+    http_response_code(400);
+    echo json_encode(['error' => 'No data received']);
+    exit();
+}
 
-    $sql = "INSERT INTO reservations (location, startTime, endTime, complete, imageName)
-            VALUES ('$location', '$startTime', '$endTime', '$complete', '$imageName')";
+$request = json_decode($postdata);
 
-    if (mysqli_query($con, $sql)) {
-        http_response_code(201);
-        echo json_encode(['message' => 'Reservation added']);
-    } else {
-        http_response_code(500);
-        echo json_encode(['error' => 'Database insert failed']);
-    }
-} else {
+if (!isset($request->data) ||
+    empty($request->data->location) ||
+    empty($request->data->startTime) ||
+    empty($request->data->endTime)) {
     http_response_code(400);
     echo json_encode(['error' => 'Missing required fields']);
+    exit();
+}
+
+$location = mysqli_real_escape_string($con, $request->data->location);
+$start = mysqli_real_escape_string($con, $request->data->startTime);
+$end = mysqli_real_escape_string($con, $request->data->endTime);
+$complete = (int) ($request->data->complete ?? 0);
+$imageName = basename($request->data->imageName ?? 'placeholder.jpg');
+
+$sql = "INSERT INTO reservations (location, startTime, endTime, complete, imageName)
+        VALUES ('$location', '$start', '$end', $complete, '$imageName')";
+
+if (mysqli_query($con, $sql)) {
+    http_response_code(201);
+    echo json_encode([
+        'data' => [
+            'ID' => mysqli_insert_id($con),
+            'location' => $location,
+            'startTime' => $start_time,
+            'endTime' => $end_time,
+            'complete' => $complete,
+            'imageName' => $imageName
+        ]
+    ]);
+} else {
+    http_response_code(500);
+    echo json_encode(['error' => mysqli_error($con)]);
 }
 ?>

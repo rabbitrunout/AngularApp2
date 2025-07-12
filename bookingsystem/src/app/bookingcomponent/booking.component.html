@@ -1,59 +1,89 @@
 <div class="container mt-5">
   <h2 class="text-center mb-4">📋 Booking List</h2>
 
-  
-  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+  <!-- ✅ Уведомления -->
   <div *ngIf="success" class="alert alert-success">{{ success }}</div>
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
 
-  <!-- form booking-->
-  <form #f="ngForm" (ngSubmit)="addReservation(f)" class="card shadow p-4 mb-5">
-    <h4 class="mb-3">📝 New Reservation</h4>
-
-    <div class="form-group mb-3">
-      <label for="location">📍 Location</label>
-      <input id="location" [(ngModel)]="reservation.location" name="location" placeholder="Enter location"
-             class="form-control" required />
+  <!-- ✅ Форма бронирования -->
+  <form #f="ngForm" (ngSubmit)="addReservation(f)" class="card p-4 shadow mb-4">
+    <div class="mb-3">
+      <label for="location" class="form-label">📍 Location</label>
+      <input
+        id="location"
+        name="location"
+        [(ngModel)]="reservation.location"
+        class="form-control"
+        placeholder="Enter location"
+        required
+      />
     </div>
 
-    <div class="form-group mb-3">
-      <label for="startTime">🕒 Start Time</label>
-      <input id="startTime" [(ngModel)]="reservation.startTime" name="startTime" type="datetime-local"
-             class="form-control" required />
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="startTime" class="form-label">🕒 Start Time</label>
+        <input
+          id="startTime"
+          type="datetime-local"
+          name="startTime"
+          [(ngModel)]="reservation.startTime"
+          class="form-control"
+          required
+        />
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label for="endTime" class="form-label">🕔 End Time</label>
+        <input
+          id="endTime"
+          type="datetime-local"
+          name="endTime"
+          [(ngModel)]="reservation.endTime"
+          class="form-control"
+          required
+        />
+      </div>
     </div>
 
-    <div class="form-group mb-3">
-      <label for="endTime">🕓 End Time</label>
-      <input id="endTime" [(ngModel)]="reservation.endTime" name="endTime" type="datetime-local"
-             class="form-control" required />
-    </div>
+    <!-- 📤 Image Upload -->
+<div class="mb-3">
+  <label for="image" class="form-label">📷 Upload Image</label>
+  <input
+    type="file"
+    id="image"
+    (change)="onFileSelected($event)"
+    class="form-control"
+    accept="image/*"
+  />
+</div>
 
-    <div class="form-check mb-3">
-      <input id="complete" [(ngModel)]="reservation.complete" name="complete" type="checkbox"
-             class="form-check-input" />
-      <label class="form-check-label" for="complete">✅ Mark as Complete</label>
+    <div class="d-flex justify-content-end">
+      <button type="submit" class="btn btn-primary">➕ Add Reservation</button>
     </div>
-
-    <button type="submit" class="btn btn-primary w-100">➕ Add Reservation</button>
   </form>
 
-  <!-- booking list-->
+  <!-- ✅ Список бронирований -->
   <div class="card shadow">
     <div class="card-body">
       <h4 class="mb-4">📅 Upcoming Reservations</h4>
 
-      <div *ngFor="let item of reservations" class="border-bottom py-3 d-flex justify-content-between align-items-center">
-        <div><strong>{{ item.location }}</strong></div>
-        <div>{{ item.startTime | date: 'dd.MM.yyyy, HH:mm' }}</div>
-        <div>{{ item.endTime | date: 'dd.MM.yyyy, HH:mm' }}</div>
-        <div [ngClass]="item.complete ? 'text-success' : 'text-warning'">
-          {{ item.complete ? '✅ Done' : '⏳ Pending' }}
+      <div *ngFor="let item of reservations" class="border-bottom py-3 d-flex flex-wrap align-items-center justify-content-between">
+        <div class="col-md-3 fw-bold">{{ item.location }}</div>
+        <div class="col-md-2 text-muted">{{ item.startTime | date: 'dd.MM.yyyy, HH:mm' }}</div>
+        <div class="col-md-2 text-muted">{{ item.endTime | date: 'dd.MM.yyyy, HH:mm' }}</div>
+        <div class="col-md-2">
+          <span [ngClass]="item.complete ? 'text-success' : 'text-warning'">
+            {{ item.complete ? '✅ Done' : '⏳ Pending' }}
+          </span>
         </div>
-        <div>
-          <img *ngIf="item.imageName"
-               [src]="'http://localhost/angularapp2/bookingapi/uploads/' + item.imageName"
-               width="50" height="50"
-               class="img-thumbnail"
-               alt="Image" />
+        <div class="col-md-2" *ngIf="item.imageName">
+          <img
+            [src]="'http://localhost/angularapp2-1/bookingapi/uploads/' + item.imageName"
+            width="50"
+            height="50"
+            class="img-thumbnail"
+            alt="Image"
+          />
         </div>
       </div>
     </div>
