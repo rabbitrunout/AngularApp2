@@ -44,8 +44,8 @@ export class BookingComponent implements OnInit {
       (data: BookingItem[]) => {
         this.reservations = data;
         this.success = 'successful list retrieval';
-        console.log('successful list retrieval');
-        console.log(this.reservations);
+        // console.log('successful list retrieval');
+        // console.log(this.reservations);
         this.cdr.detectChanges();
       },
       (err) => {
@@ -54,13 +54,6 @@ export class BookingComponent implements OnInit {
       }
     );
   }
-
-  // getReservations(): void {
-  //   this.reservationService.getAll().subscribe(
-  //     (data) => (this.reservations = data),
-  //     (err) => (this.error = 'Failed to load reservations')
-  //   );
-  // }
 
   addReservation(f: NgForm): void {
     this.resetAlerts();
@@ -122,6 +115,31 @@ export class BookingComponent implements OnInit {
   };
   this.isEditing = true;
 }
+
+  // editReservation(
+  //   location: any, 
+  //   start_time: any, 
+  //   end_time: any, 
+  //   complete: any, 
+  //   ID: any)
+  // {
+  //   this.resetAlerts();
+  //   this.reservationService.edit({
+  //     location: location.value, 
+  //     start_time: start_time.value, 
+  //     end_time: end_time.value, 
+  //     complete: complete.value, 
+  //     ID: +ID})
+  //     .subscribe(
+  //       (res) => {
+  //         this.cdr.detectChanges(); // <--- force UI update
+  //         this.success = 'Successfully edited';
+  //       },
+  //       (err) => (
+  //         this.error = err. message
+  //       )
+  //     );
+  // }
 
   deleteReservation(ID?: number): void {
     if (!ID) return;
