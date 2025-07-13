@@ -52,36 +52,59 @@ export class BookingComponent implements OnInit {
     );
   }
 
-  addReservation(f: NgForm) {
+  addReservation(f: NgForm): void {
   this.resetAlerts();
 
+  const isEdit = !!this.reservation.ID;
+
+  const proceed = () => {
+    if (isEdit) {
+      // РЕДАКТИРОВАНИЕ
+      console.log('Editing reservation:', this.reservation);
+      this.reservationService.edit(this.reservation).subscribe(
+        () => {
+          this.success = 'Reservation updated successfully';
+          this.getReservations();
+          f.resetForm();
+          this.resetForm();
+        },
+        (err) => {
+          this.error = 'Error updating reservation';
+          console.error(err);
+        }
+      );
+    } else {
+      // НОВОЕ БРОНИРОВАНИЕ
+      console.log('Creating reservation:', this.reservation);
+      this.createReservation(f);
+    }
+  };
+
+  // 🔄 Обработка загрузки изображения (если выбрано)
   if (this.selectedFile) {
     const formData = new FormData();
     formData.append('image', this.selectedFile);
 
     this.http.post<any>('http://localhost/angularapp2/bookingapi/upload.php', formData).subscribe(
       (uploadResponse) => {
-        // ❗❗❗ ПОЛУЧАЕМ fileName от upload.php
-        if (uploadResponse && uploadResponse.fileName) {
-          this.reservation.imageName = uploadResponse.fileName;
-        } else {
-          this.reservation.imageName = 'placeholder.jpg';
-        }
-
-        // ✅ После загрузки — создаём запись
-        this.createReservation(f);
+        this.reservation.imageName = uploadResponse?.fileName || 'placeholder.jpg';
+        proceed();
       },
       (error) => {
         this.error = 'Image upload failed';
         this.reservation.imageName = 'placeholder.jpg';
-        this.createReservation(f); // fallback
+        proceed(); // fallback
       }
     );
   } else {
-    this.reservation.imageName = 'placeholder.jpg'; // если файл не выбран
-    this.createReservation(f);
+    if (!this.reservation.imageName) {
+      this.reservation.imageName = 'placeholder.jpg';
+    }
+    proceed();
   }
 }
+
+
 
 
   private createReservation(f: NgForm): void {
@@ -98,6 +121,38 @@ export class BookingComponent implements OnInit {
       }
     );
   }
+
+  editReservation(item: BookingItem): void {
+      this.reservation = {
+            ID: item.ID,
+            location: item.location,
+            start_time: item.start_time,
+            end_time: item.end_time,
+            complete: item.complete,
+            imageName: item.imageName
+};
+}
+
+deleteReservation(id?: number): void {
+  if (id === undefined) {
+    this.error = 'ID is missing';
+    return;
+  }
+
+  this.reservationService.delete(id).subscribe(
+    () => {
+      this.success = 'Reservation deleted';
+      this.getReservations();
+    },
+    (err) => {
+      this.error = 'Delete failed';
+      console.error(err);
+    }
+  );
+}
+
+
+
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;

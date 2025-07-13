@@ -7,15 +7,15 @@ require 'connect.php';
 
 parse_str(file_get_contents("php://input"), $DELETE);
 
-if (!isset($DELETE['id'])) {
+if (!isset($DELETE['ID'])) {
     http_response_code(400);
     echo json_encode(['error' => 'ID is required']);
     exit;
 }
 
-$id = (int)$DELETE['id'];
+$ID = (int)$DELETE['ID'];
 
-$sql = "DELETE FROM reservations WHERE id = $id";
+$sql = "DELETE FROM reservations WHERE ID = $ID";
 
 if (mysqli_query($con, $sql)) {
     echo json_encode(['message' => 'Reservation deleted']);

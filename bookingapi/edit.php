@@ -1,42 +1,43 @@
 <?php
-header('Access-Control-Allow-Origin: *');
-header("Access-Control-Allow-Methods: PUT, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type");
+  require 'connect.php';
 
-require 'connect.php';
+  // Get the posted data
+  $postdata = file_get_contents("php://input");
 
-$data = json_decode(file_get_contents("php://input"));
+  if (isset($postdata) && !empty($postdata)) {
+    // Extract the data
+    $request = json_decode($postdata);
 
-if (
-    !isset($data->ID) ||
-    !isset($data->location) ||
-    !isset($data->startTime) ||
-    !isset($data->endTime)
-) {
-    http_response_code(400);
-    echo json_encode(['error' => 'Missing required fields']);
-    exit;
-}
+    // Validate
+    if ((int)$request->data->ID < 1 ||
+        trim($request->data->location) === '' ||
+        trim($request->data->start_time) === '' ||
+        trim($request->data->end_time) === '') {
+      return http_response_code(400);
+    }
 
-$id = (int)$data->ID;
-$location = mysqli_real_escape_string($con, $data->location);
-$startTime = mysqli_real_escape_string($con, $data->startTime);
-$endTime = mysqli_real_escape_string($con, $data->endTime);
-$complete = isset($data->complete) ? (int)$data->complete : 0;
-$imageName = isset($data->imageName) ? mysqli_real_escape_string($con, $data->imageName) : '';
+    // Sanitize
+    $ID = mysqli_real_escape_string($con, (int)$request->data->ID);
+    $location = mysqli_real_escape_string($con, trim($request->data->location));
+    $start_time = mysqli_real_escape_string($con, trim($request->data->start_time));
+    $end_time = mysqli_real_escape_string($con, trim($request->data->end_time));
+    $complete = isset($request->data->complete) ? (int)$request->data->complete : 0;
+    $imageName = isset($request->data->imageName) ? mysqli_real_escape_string($con, trim($request->data->imageName)) : 'placeholder.jpg';
 
-$sql = "UPDATE reservations SET
-        location = '$location',
-        startTime = '$startTime',
-        endTime = '$endTime',
-        complete = '$complete',
-        imageName = '$imageName'
-        WHERE id = $id";
+    // Update query
+    $sql = "UPDATE `reservations` 
+            SET `location` = '$location', 
+                `start_time` = '$start_time', 
+                `end_time` = '$end_time', 
+                `reserved` = '$complete', 
+                `imageName` = '$imageName' 
+            WHERE `ID` = '$ID' 
+            LIMIT 1";
 
-if (mysqli_query($con, $sql)) {
-    echo json_encode(['message' => 'Reservation updated']);
-} else {
-    http_response_code(500);
-    echo json_encode(['error' => 'Update failed']);
-}
+    if (mysqli_query($con, $sql)) {
+      http_response_code(204);
+    } else {
+      http_response_code(422);
+    }
+  }
 ?>

@@ -21,8 +21,9 @@ export class BookingService {
 
 
   edit(reservation: BookingItem) {
-    return this.http.put(`${this.baseUrl}/edit.php`, reservation);
-  }
+  return this.http.post('http://localhost/angularapp2/bookingapi/edit.php', reservation);
+}
+
 
   delete(ID: number) {
     const params = new HttpParams().set('ID', ID.toString());
@@ -32,6 +33,6 @@ export class BookingService {
   uploadFile(file: File) {
     const formData = new FormData();
     formData.append('image', file);
-    return this.http.post(`${this.baseUrl}/upload.php`, formData);
+    return this.http.post(`${this.baseUrl}/upload`, formData);
   }
 }
