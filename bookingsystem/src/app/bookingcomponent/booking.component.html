@@ -1,49 +1,52 @@
-<div class="container mt-5">
+<div class="container py-5">
   <h2 class="text-center mb-4">📋 Booking List</h2>
 
-  <div *ngIf="success" class="alert alert-success">{{ success }}</div>
-  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+  <div *ngIf="success" class="alert alert-success rounded-3">{{ success }}</div>
+  <div *ngIf="error" class="alert alert-danger rounded-3">{{ error }}</div>
 
-  <form #f="ngForm" (ngSubmit)="addReservation(f)" class="card p-4 shadow mb-4">
+  <form #f="ngForm" (ngSubmit)="addReservation(f)" class="card shadow-sm p-4 mb-4 border-start border-primary border-4 rounded-4 bg-light">
     <h5 class="mb-3">{{ isEditing ? '✏️ Editing Reservation' : '➕ Add Reservation' }}</h5>
 
     <div class="mb-3">
-      <label for="location">📍 Location</label>
+      <label for="location" class="form-label fw-semibold">📍 Location</label>
       <input
         id="location"
-        class="form-control"
+        class="form-control rounded-3"
         [(ngModel)]="reservation.location"
-        name="location" required />
+        name="location"
+        required />
     </div>
 
-    <div class="row">
-      <div class="col-md-6 mb-3">
-        <label for="startTime">🕒 Start Time</label>
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label for="startTime" class="form-label fw-semibold">🕒 Start Time</label>
         <input
           id="startTime"
           type="datetime-local"
-          class="form-control"
+          class="form-control rounded-3"
           [(ngModel)]="reservation.start_time"
-           name="start_time" required/>
+          name="start_time"
+          required />
       </div>
-      <div class="col-md-6 mb-3">
-        <label for="endTime">🕔 End Time</label>
+      <div class="col-md-6">
+        <label for="endTime" class="form-label fw-semibold">🕔 End Time</label>
         <input
           id="endTime"
           type="datetime-local"
-          class="form-control"
-          [(ngModel)]="reservation.end_time" 
-          name="end_time" required />
+          class="form-control rounded-3"
+          [(ngModel)]="reservation.end_time"
+          name="end_time"
+          required />
       </div>
     </div>
 
-    <div class="mb-3">
-      <label for="image">📷 Upload Image</label>
+    <div class="my-3">
+      <label for="image" class="form-label fw-semibold">📷 Upload Image</label>
       <input
         type="file"
         id="image"
         (change)="onFileSelected($event)"
-        class="form-control"
+        class="form-control rounded-3"
         accept="image/*" />
     </div>
 
@@ -57,26 +60,24 @@
       <label for="complete" class="form-check-label">✅ Complete</label>
     </div>
 
-    <div class="d-flex justify-content-between">
-      <button type="submit" class="btn btn-primary">
-  {{ isEditing ? 'Update Reservation' : 'Add Reservation' }}
-</button>
-      <button type="button" class="btn btn-secondary" (click)="resetForm(f)" *ngIf="isEditing">
+    <div class="d-flex justify-content-between align-items-center mt-3">
+      <button type="submit" class="btn btn-primary rounded-pill px-4">
+        {{ isEditing ? 'Update Reservation' : 'Add Reservation' }}
+      </button>
+      <button type="button" class="btn btn-outline-secondary rounded-pill px-4" (click)="resetForm(f)" *ngIf="isEditing">
         ❌ Cancel
       </button>
     </div>
   </form>
 
-  <div class="card shadow">
+  <div class="card shadow-sm rounded-4">
     <div class="card-body">
       <h4 class="mb-4">📅 Upcoming Reservations</h4>
 
-      <div
-        *ngFor="let item of reservations"
-        class="border-bottom py-3 d-flex flex-wrap align-items-center justify-content-between">
-        <div class="col-md-3 fw-bold">{{ item.location }}</div>
-        <div class="col-md-2 text-muted">{{ item.start_time | date: 'dd.MM.yyyy, HH:mm' }}</div>
-        <div class="col-md-2 text-muted">{{ item.end_time | date: 'dd.MM.yyyy, HH:mm' }}</div>
+      <div *ngFor="let item of reservations" class="py-3 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div class="fw-bold col-md-3">{{ item.location }}</div>
+        <div class="text-muted col-md-2">{{ item.start_time | date: 'dd.MM.yyyy, HH:mm' }}</div>
+        <div class="text-muted col-md-2">{{ item.end_time | date: 'dd.MM.yyyy, HH:mm' }}</div>
         <div class="col-md-2">
           <span [ngClass]="item.complete ? 'text-success' : 'text-warning'">
             {{ item.complete ? '✅ Done' : '⏳ Pending' }}
@@ -85,14 +86,13 @@
         <div class="col-md-2" *ngIf="item.imageName">
           <img
             [src]="'http://localhost/angularapp2/bookingapi/uploads/' + item.imageName"
-            width="75"
-            height="75"
-            class="img-thumbnail"
+            class="img-thumbnail rounded-3"
+            style="width: 75px; height: 75px; object-fit: cover"
             alt="Image" />
         </div>
-        <div class="col-2 d-flex gap-2">
-          <button class="btn btn-success btn-sm" (click)="editReservation(item)">✏️ Edit</button>
-          <button class="btn btn-danger btn-sm" (click)="deleteReservation(item.ID)">🗑️ Delete</button>
+        <div class="d-flex gap-2 col-12 col-md-auto">
+          <button class="btn btn-success btn-sm rounded-pill px-3" (click)="editReservation(item)">✏️ Edit</button>
+          <button class="btn btn-danger btn-sm rounded-pill px-3" (click)="deleteReservation(item.ID)">🗑️ Delete</button>
         </div>
       </div>
     </div>
