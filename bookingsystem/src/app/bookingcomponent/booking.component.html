@@ -1,75 +1,82 @@
 <div class="container mt-5">
   <h2 class="text-center mb-4">📋 Booking List</h2>
 
-  <!-- ✅ Уведомления -->
   <div *ngIf="success" class="alert alert-success">{{ success }}</div>
   <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
 
-  <!-- ✅ Форма бронирования -->
   <form #f="ngForm" (ngSubmit)="addReservation(f)" class="card p-4 shadow mb-4">
+    <h5 class="mb-3">{{ isEditing ? '✏️ Editing Reservation' : '➕ Add Reservation' }}</h5>
+
     <div class="mb-3">
-      <label for="location" class="form-label">📍 Location</label>
+      <label for="location">📍 Location</label>
       <input
         id="location"
         name="location"
         [(ngModel)]="reservation.location"
         class="form-control"
-        placeholder="Enter location"
-        required
-      />
+        required />
     </div>
 
     <div class="row">
       <div class="col-md-6 mb-3">
-        <label for="startTime" class="form-label">🕒 Start Time</label>
+        <label for="startTime">🕒 Start Time</label>
         <input
           id="startTime"
           type="datetime-local"
           name="start_time"
           [(ngModel)]="reservation.start_time"
           class="form-control"
-          required
-        />
+          required />
       </div>
-
       <div class="col-md-6 mb-3">
-        <label for="endTime" class="form-label">🕔 End Time</label>
+        <label for="endTime">🕔 End Time</label>
         <input
           id="endTime"
           type="datetime-local"
           name="end_time"
           [(ngModel)]="reservation.end_time"
           class="form-control"
-          required
-        />
+          required />
       </div>
     </div>
 
-    <!-- 📤 Image Upload -->
-<div class="mb-3">
-  <label for="image" class="form-label">📷 Upload Image</label>
-  <input
-    type="file"
-    id="image"
-    (change)="onFileSelected($event)"
-    class="form-control"
-    accept="image/*"
-  />
-</div>
+    <div class="mb-3">
+      <label for="image">📷 Upload Image</label>
+      <input
+        type="file"
+        id="image"
+        (change)="onFileSelected($event)"
+        class="form-control"
+        accept="image/*" />
+    </div>
 
-    <div class="d-flex justify-content-end">
+    <div class="form-check mb-3">
+      <input
+        type="checkbox"
+        id="complete"
+        name="complete"
+        class="form-check-input"
+        [(ngModel)]="reservation.complete" />
+      <label for="complete" class="form-check-label">✅ Complete</label>
+    </div>
+
+    <div class="d-flex justify-content-between">
       <button type="submit" class="btn btn-primary">
-         {{ reservation.ID ? '💾 Save Changes' : '➕ Add Reservation' }}
+        {{ isEditing ? '💾 Save Changes' : '➕ Add Reservation' }}
+      </button>
+      <button type="button" class="btn btn-secondary" (click)="resetForm(f)" *ngIf="isEditing">
+        ❌ Cancel
       </button>
     </div>
   </form>
 
-  <!-- ✅ Список бронирований -->
   <div class="card shadow">
     <div class="card-body">
       <h4 class="mb-4">📅 Upcoming Reservations</h4>
 
-      <div *ngFor="let item of reservations" class="border-bottom py-3 d-flex flex-wrap align-items-center justify-content-between">
+      <div
+        *ngFor="let item of reservations"
+        class="border-bottom py-3 d-flex flex-wrap align-items-center justify-content-between">
         <div class="col-md-3 fw-bold">{{ item.location }}</div>
         <div class="col-md-2 text-muted">{{ item.start_time | date: 'dd.MM.yyyy, HH:mm' }}</div>
         <div class="col-md-2 text-muted">{{ item.end_time | date: 'dd.MM.yyyy, HH:mm' }}</div>
@@ -78,43 +85,18 @@
             {{ item.complete ? '✅ Done' : '⏳ Pending' }}
           </span>
         </div>
-        
         <div class="col-md-2" *ngIf="item.imageName">
           <img
             [src]="'http://localhost/angularapp2/bookingapi/uploads/' + item.imageName"
             width="75"
             height="75"
             class="img-thumbnail"
-            alt="Image"
-          />
+            alt="Image" />
         </div>
-         <!-- <div class="col-2">
- <button
-  class="btn btn-success btn-sm me-2"
-  (click)="populateForm(item)">
-  ✏️ Edit
-</button>
-<button class="btn btn-success btn-sm me-2" (click)="deleteReservation(item.ID!)">🗑️ Delete</button>
-
-</div> -->
-<div class="col-2 d-flex gap-2" *ngIf="item">
-  <button
-    type="button"
-    class="btn btn-success btn-sm"
-    (click)="editReservation(item)">
-    ✏️ Edit
-  </button>
-
-  <button
-    type="button"
-    class="btn btn-danger btn-sm"
-    (click)="deleteReservation(item.ID || 0)">
-    🗑️ Delete
-  </button>
-</div>
-
-
-
+        <div class="col-2 d-flex gap-2">
+          <button class="btn btn-success btn-sm" (click)="editReservation(item)">✏️ Edit</button>
+          <button class="btn btn-danger btn-sm" (click)="deleteReservation(item.ID)">🗑️ Delete</button>
+        </div>
       </div>
     </div>
   </div>

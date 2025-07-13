@@ -5,6 +5,7 @@ import { BookingItem } from "./bookingItem";
 
 @Injectable({ providedIn: 'root' })
 export class BookingService {
+
   baseUrl = 'http://localhost/angularapp2/bookingapi';
 
   constructor(private http: HttpClient) {}
@@ -19,11 +20,9 @@ export class BookingService {
   return this.http.post<BookingItem>('http://localhost/angularapp2/bookingapi/add.php', reservation);
 }
 
-
   edit(reservation: BookingItem) {
   return this.http.post('http://localhost/angularapp2/bookingapi/edit.php', reservation);
 }
-
 
   delete(ID: number) {
     const params = new HttpParams().set('ID', ID.toString());

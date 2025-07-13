@@ -1,43 +1,58 @@
 <?php
-  require 'connect.php';
+require 'connect.php';
 
-  // Get the posted data
-  $postdata = file_get_contents("php://input");
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-  if (isset($postdata) && !empty($postdata)) {
-    // Extract the data
-    $request = json_decode($postdata);
+header("Access-Control-Allow-Origin: http://localhost:4200");
+header("Access-Control-Allow-Headers: Content-Type");
+header("Access-Control-Allow-Methods: POST");
+header("Content-Type: application/json");
 
-    // Validate
-    if ((int)$request->data->ID < 1 ||
-        trim($request->data->location) === '' ||
-        trim($request->data->start_time) === '' ||
-        trim($request->data->end_time) === '') {
-      return http_response_code(400);
-    }
+$input = file_get_contents("php://input");
+$data = json_decode($input, true);
 
-    // Sanitize
-    $ID = mysqli_real_escape_string($con, (int)$request->data->ID);
-    $location = mysqli_real_escape_string($con, trim($request->data->location));
-    $start_time = mysqli_real_escape_string($con, trim($request->data->start_time));
-    $end_time = mysqli_real_escape_string($con, trim($request->data->end_time));
-    $complete = isset($request->data->complete) ? (int)$request->data->complete : 0;
-    $imageName = isset($request->data->imageName) ? mysqli_real_escape_string($con, trim($request->data->imageName)) : 'placeholder.jpg';
+// Проверка на валидность данных
+if (!isset($data['ID'], $data['location'], $data['start_time'], $data['end_time'])) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Missing required fields']);
+    exit;
+}
 
-    // Update query
-    $sql = "UPDATE `reservations` 
-            SET `location` = '$location', 
-                `start_time` = '$start_time', 
-                `end_time` = '$end_time', 
-                `reserved` = '$complete', 
-                `imageName` = '$imageName' 
-            WHERE `ID` = '$ID' 
-            LIMIT 1";
+// Валидация значений
+if ((int)$data['ID'] < 1 || 
+    trim($data['location']) === '' || 
+    trim($data['start_time']) === '' || 
+    trim($data['end_time']) === '') {
+    http_response_code(400);
+    echo json_encode(['error' => 'Invalid field values']);
+    exit;
+}
 
-    if (mysqli_query($con, $sql)) {
-      http_response_code(204);
-    } else {
-      http_response_code(422);
-    }
-  }
+// Очистка данных
+$ID = mysqli_real_escape_string($con, (int)$data['ID']);
+$location = mysqli_real_escape_string($con, trim($data['location']));
+$start_time = mysqli_real_escape_string($con, trim($data['start_time']));
+$end_time = mysqli_real_escape_string($con, trim($data['end_time']));
+$complete = isset($data['complete']) ? (int)$data['complete'] : 0;
+$imageName = isset($data['imageName']) ? mysqli_real_escape_string($con, trim($data['imageName'])) : 'placeholder.jpg';
+
+// SQL запрос
+$sql = "UPDATE reservations 
+        SET location = '$location', 
+            start_time = '$start_time', 
+            end_time = '$end_time', 
+            complete = '$complete', 
+            imageName = '$imageName' 
+        WHERE ID = '$ID' 
+        LIMIT 1";
+
+if (mysqli_query($con, $sql)) {
+    http_response_code(200);
+    echo json_encode(['message' => 'Reservation updated']);
+} else {
+    http_response_code(500);
+    echo json_encode(['error' => mysqli_error($con)]);
+}
 ?>

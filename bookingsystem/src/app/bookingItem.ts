@@ -4,5 +4,5 @@ export interface BookingItem {
   start_time: string;
   end_time: string;
   complete: boolean;
-  imageName: string;
+  imageName?: string;
 }
