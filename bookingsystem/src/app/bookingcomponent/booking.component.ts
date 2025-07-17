@@ -1,21 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { BookingItem } from '../bookingItem';
 import { BookingService } from '../booking.service';
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef } from '@angular/core';
+import { RouterModule } from '@angular/router';
 
 @Component({
   standalone: true,
   selector: 'app-booking',
-  templateUrl: './booking.component.html',
-  styleUrls: ['./booking.component.css'],
-  imports: [CommonModule, FormsModule],
+  imports: [HttpClientModule,CommonModule, FormsModule, RouterModule],
   providers: [BookingService],
+  templateUrl: './booking.component.html',
+  styleUrls: ['./booking.component.css']
 })
 export class BookingComponent implements OnInit {
-  reservations: BookingItem[] = [];
+  title = 'BookingSystem';
+  public reservations: BookingItem[] = [];
   reservation: BookingItem = {
     ID: 0,
     location: '',
@@ -24,10 +26,12 @@ export class BookingComponent implements OnInit {
     complete: false,
     imageName: ''
   };
-  selectedFile: File | null = null;
+
   success = '';
   error = '';
+  
   isEditing = false;
+  selectedFile: File | null = null;
 
   constructor(private reservationService: BookingService, 
               private http: HttpClient,

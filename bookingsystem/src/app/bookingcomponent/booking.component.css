@@ -55,3 +55,8 @@ h2 {
 .alert {
   margin-bottom: 15px;
 }
+
+#links > button {    
+    width: 20%;
+    margin-left: 10px;
+}
