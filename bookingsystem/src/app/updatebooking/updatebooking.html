@@ -1,120 +1,64 @@
-<div class="container mt-5">
+<div class="container mt-4">
+  <h2 class="mb-4">Редактировать бронирование</h2>
 
-  <!-- Навигационные ссылки -->
-  <div class="header-with-links d-flex align-items-center mb-4">
-    <div id="links" class="btn-group" role="group" aria-label="Navigation Links">
-      <a class="btn btn-outline-primary" routerLink="/booking" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
-        View Reservations
-      </a>
-      <a class="btn btn-outline-primary" routerLink="/add" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
-        Add Reservation
-      </a>
-      <a class="btn btn-outline-primary" routerLink="/about">
-        About Us
-      </a>
-    </div>
-  </div>
-
-  <h2 class="mb-4">Update Reservation</h2>
-
-  <!-- Сообщения об успехе / ошибке -->
+  <!-- Уведомления -->
   <div *ngIf="success" class="alert alert-success">{{ success }}</div>
   <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
 
-  <!-- Изображение -->
-  <div class="mb-3">
-    <label class="form-label fw-semibold">Image Preview</label>
-    <div class="d-flex gap-3 align-items-center">
-      
-      <!-- Текущее изображение -->
-      <div *ngIf="reservation.imageName && !previewUrl">
-        <p class="mb-1">Current Image</p>
-        <img 
-          [src]="'http://localhost/angularapp2/bookingapi/uploads/' + reservation.imageName" 
-          width="120" height="120" 
-          class="img-thumbnail rounded-3" 
-          alt="Current Image">
-      </div>
-
-      <!-- Новое изображение -->
-      <div *ngIf="previewUrl">
-        <p class="mb-1">New Image</p>
-        <img 
-          [src]="previewUrl" 
-          width="120" height="120" 
-          class="img-thumbnail rounded-3" 
-          alt="New Preview Image">
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Выбор файла -->
-  <div class="mb-3">
-    <label for="image" class="form-label fw-semibold">Select New Image</label>
-    <input 
-      type="file" 
-      id="image" 
-      class="form-control" 
-      accept="image/*" 
-      (change)="onFileSelected($event)">
-  </div>
-
-  <!-- Форма редактирования -->
   <form #form="ngForm" (ngSubmit)="updateReservation(form)">
-    
     <!-- Локация -->
     <div class="mb-3">
-      <label for="location" class="form-label fw-semibold">Location</label>
-      <input 
-        id="location" 
-        type="text" 
-        class="form-control rounded-3" 
-        [(ngModel)]="reservation.location" 
-        name="location" 
-        required>
+      <label for="location" class="form-label">Локация</label>
+      <input type="text" id="location" name="location" class="form-control"
+             required [(ngModel)]="reservation.location">
     </div>
 
     <!-- Время начала -->
     <div class="mb-3">
-      <label for="start_time" class="form-label fw-semibold">Start Time</label>
-      <input 
-        id="start_time" 
-        type="datetime-local" 
-        class="form-control rounded-3" 
-        [(ngModel)]="reservation.start_time" 
-        name="start_time" 
-        required>
+      <label for="start_time" class="form-label">Начало</label>
+      <input type="datetime-local" id="start_time" name="start_time" class="form-control"
+             required [(ngModel)]="reservation.start_time">
     </div>
 
     <!-- Время окончания -->
     <div class="mb-3">
-      <label for="end_time" class="form-label fw-semibold">End Time</label>
-      <input 
-        id="end_time" 
-        type="datetime-local" 
-        class="form-control rounded-3" 
-        [(ngModel)]="reservation.end_time" 
-        name="end_time" 
-        required>
+      <label for="end_time" class="form-label">Окончание</label>
+      <input type="datetime-local" id="end_time" name="end_time" class="form-control"
+             required [(ngModel)]="reservation.end_time">
     </div>
 
-    <!-- Чекбокс "Complete" -->
-    <div class="form-check mb-3">
-      <input 
-        type="checkbox" 
-        id="complete" 
-        class="form-check-input" 
-        [(ngModel)]="reservation.complete" 
-        name="complete">
-      <label for="complete" class="form-check-label">Complete</label>
+    <!-- Завершено? -->
+    <div class="mb-3 form-check">
+      <input type="checkbox" id="complete" name="complete" class="form-check-input"
+             [(ngModel)]="reservation.complete">
+      <label for="complete" class="form-check-label">Завершено</label>
+    </div>
+
+    <!-- Изображение -->
+    <div class="mb-3">
+      <label for="image" class="form-label">Изображение</label>
+      <input type="file" id="image" name="image" class="form-control"
+             (change)="onFileSelected($event)">
+    </div>
+
+    <!-- Превью -->
+    <div class="mb-3" *ngIf="previewUrl">
+      <label class="form-label">Предпросмотр:</label><br>
+      <img [src]="previewUrl" alt="Preview" class="img-thumbnail" style="max-width: 200px;">
     </div>
 
     <!-- Кнопки -->
     <div class="d-flex gap-2">
-      <button class="btn btn-primary" type="submit">Update</button>
-      <button class="btn btn-secondary" type="button" (click)="cancelUpdate()">Cancel</button>
+      <button type="submit" class="btn btn-primary" [disabled]="form.invalid">💾 Сохранить</button>
+      <button type="button" class="btn btn-secondary" (click)="cancelUpdate()">↩️ Отмена</button>
     </div>
-
   </form>
+</div>
+
+
+
+<div id="links">
+    <button class="btn btn-sm btn-dark text-white" routerLink="/bookingcomponent">
+       🔙 Back to Booking List
+    </button>
 </div>

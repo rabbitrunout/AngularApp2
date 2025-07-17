@@ -32,7 +32,8 @@ export class BookingComponent implements OnInit {
   ) {}
 
   goToEdit(id: number) {
-    this.router.navigate(['/updatebooking', id]);
+    // Исправлено с 'updatebooking' на 'edit' — совпадает с маршрутом
+    this.router.navigate(['/edit', id]);
   }
 
   ngOnInit(): void {
@@ -44,10 +45,12 @@ export class BookingComponent implements OnInit {
       next: (data) => {
         this.reservations = data;
         this.success = 'Reservations loaded successfully';
+        this.error = '';
         this.cdr.detectChanges();
       },
       error: () => {
         this.error = 'Failed to load reservations';
+        this.success = '';
       }
     });
   }
@@ -56,6 +59,8 @@ export class BookingComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     if (input.files?.length) {
       this.selectedFile = input.files[0];
+      this.error = '';
+      this.success = '';
     }
   }
 
@@ -87,11 +92,13 @@ export class BookingComponent implements OnInit {
     action$.subscribe({
       next: () => {
         this.success = isEdit ? 'Reservation updated successfully' : 'Reservation added successfully';
+        this.error = '';
         this.getReservations();
         this.resetForm(form);
       },
       error: () => {
         this.error = isEdit ? 'Error updating reservation' : 'Error creating reservation';
+        this.success = '';
       }
     });
   }
@@ -99,15 +106,22 @@ export class BookingComponent implements OnInit {
   editReservation(item: BookingItem): void {
     this.reservation = { ...item };
     this.isEditing = true;
+    this.error = '';
+    this.success = '';
   }
+
   deleteReservation(ID?: number): void {
     if (!ID) return;
     this.reservationService.delete(ID).subscribe({
       next: () => {
         this.success = 'Deleted successfully';
+        this.error = '';
         this.getReservations();
       },
-      error: () => (this.error = 'Failed to delete reservation')
+      error: () => {
+        this.error = 'Failed to delete reservation';
+        this.success = '';
+      }
     });
   }
 
@@ -115,8 +129,7 @@ export class BookingComponent implements OnInit {
     this.reservation = this.getEmptyReservation();
     this.selectedFile = null;
     this.isEditing = false;
-    this.success = '';
-    this.error = '';
+    this.resetAlerts();
     form?.resetForm();
   }
 

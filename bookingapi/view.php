@@ -16,6 +16,10 @@ $sql = "SELECT * FROM reservations WHERE ID = {$id} LIMIT 1";
 if ($result = mysqli_query($con, $sql)) {
     if (mysqli_num_rows($result) == 1) {
         $reservation = mysqli_fetch_assoc($result);
+
+
+        $reservation['imageName'] = $reservation['image_name'];
+        
         header('Content-Type: application/json');
         echo json_encode($reservation);
     } else {

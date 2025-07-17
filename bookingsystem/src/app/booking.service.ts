@@ -17,12 +17,12 @@ export class BookingService {
 }
 
 
-  getById(id: number): Observable<BookingItem> {
-    const params = new HttpParams().set('ID', id.toString());
-    return this.http.get<{ data: BookingItem }>(`${this.baseUrl}/edit.php`, { params }).pipe(
-      map(res => res.data)
-    );
-  }
+ getById(id: number): Observable<BookingItem> {
+  const params = new HttpParams().set('id', id.toString());  // 'id', не 'ID'
+  return this.http.get<BookingItem>(`${this.baseUrl}/view.php`, { params });
+}
+
+
 
   add(formData: FormData): Observable<BookingItem> {
     return this.http.post<BookingItem>(`${this.baseUrl}/add.php`, formData);

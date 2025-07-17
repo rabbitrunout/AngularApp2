@@ -4,7 +4,7 @@
   <div *ngIf="success" class="alert alert-success rounded-3">{{ success }}</div>
   <div *ngIf="error" class="alert alert-danger rounded-3">{{ error }}</div>
 
-  <form #f="ngForm" (ngSubmit)="addReservation(f)" class="card shadow-sm p-4 mb-4 border-start border-primary border-4 rounded-4 bg-light">
+  <!-- <form #f="ngForm" (ngSubmit)="addReservation(f)" class="card shadow-sm p-4 mb-4 border-start border-primary border-4 rounded-4 bg-light">
     <h5 class="mb-3">{{ isEditing ? '✏️ Editing Reservation' : '➕ Add Reservation' }}</h5>
 
     <div class="mb-3">
@@ -68,7 +68,7 @@
         ❌ Cancel
       </button>
     </div>
-  </form>
+  </form> -->
 
   <div class="card shadow-sm rounded-4">
     <div class="card-body">
@@ -90,10 +90,10 @@
             style="width: 75px; height: 75px; object-fit: cover"
             alt="Image" />
         </div>
-        <div class="d-flex gap-2 col-12 col-md-auto">
-         <button class="btn btn-sm btn-primary" [routerLink]="['/updatebooking', reservation.ID]">✏️ Edit</button>
+        <div class="col-2">
+          <button class="btn btn-success btn-sm" [routerLink]="['/edit', item.ID]">Edit</button>
 
-          <button class="btn btn-danger btn-sm rounded-pill px-3" (click)="deleteReservation(item.ID)">🗑️ Delete</button>
+          <!-- <button class="btn btn-danger btn-sm" (click)="deleteContact(item.contactID ? item.contactID : 0)">Delete</button> -->
         </div>
       </div>
     </div>

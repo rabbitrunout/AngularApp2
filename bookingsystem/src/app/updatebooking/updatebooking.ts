@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient, HttpClientModule, HttpErrorResponse } from '@angular/common/http';
 import { NgForm, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -8,7 +8,7 @@ import { BookingItem } from '../bookingItem';
 @Component({
   selector: 'app-updatebooking',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule, RouterModule],
+  imports: [CommonModule, HttpClientModule, FormsModule],
   templateUrl: './updatebooking.html',
   styleUrls: ['./updatebooking.css']
 })
@@ -23,12 +23,11 @@ export class UpdatebookingComponent implements OnInit {
     imageName: ''
   };
 
+  success = '';
+  error = '';
   selectedFile: File | null = null;
   previewUrl: string | null = null;
   originalImageName: string = '';
-
-  success = '';
-  error = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -38,18 +37,33 @@ export class UpdatebookingComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.bookingID = +this.route.snapshot.paramMap.get('id')!;
-    this.http.get<BookingItem>(`http://localhost/your-api/getbooking.php?ID=${this.bookingID}`)
-      .subscribe({
-        next: (data: BookingItem) => {
-          this.reservation = data;
-          this.originalImageName = data.imageName || '';
-          this.previewUrl = `http://localhost/your-api/uploads/${this.originalImageName}`;
-          this.cdr.detectChanges();
-        },
-        error: () => this.error = 'Ошибка при загрузке данных бронирования.'
-      });
+  const idParam = this.route.snapshot.paramMap.get('id');
+  if (!idParam) {
+    this.error = 'Invalid booking ID';
+    return;
   }
+
+  this.bookingID = +idParam;
+  if (this.bookingID <= 0) {
+    this.error = 'Invalid booking ID';
+    return;
+  }
+
+  this.http.get<BookingItem>(`http://localhost/angularapp2/bookingapi/view.php?id=${this.bookingID}`)
+    .subscribe({
+      next: (data) => {
+        this.reservation = {
+          ...data,
+          complete: Boolean(data.complete),
+          imageName: (data as any).image_name || data.imageName || ''
+        };
+        this.originalImageName = this.reservation.imageName || '';
+        this.previewUrl = `http://localhost/angularapp2/bookingapi/uploads/${this.originalImageName}`;
+        this.cdr.detectChanges();
+      },
+      error: () => this.error = 'Ошибка при загрузке данных бронирования.'
+    });
+}
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -71,17 +85,17 @@ export class UpdatebookingComponent implements OnInit {
 
     const formData = new FormData();
     formData.append('ID', this.bookingID.toString());
-    formData.append('location', this.reservation.location);
-    formData.append('start_time', this.reservation.start_time);
-    formData.append('end_time', this.reservation.end_time);
+    formData.append('location', this.reservation.location || '');
+    formData.append('start_time', this.reservation.start_time || '');
+    formData.append('end_time', this.reservation.end_time || '');
     formData.append('complete', this.reservation.complete ? '1' : '0');
-    formData.append('existingImage', this.originalImageName);
+    formData.append('existingImage', this.originalImageName || '');
 
     if (this.selectedFile) {
       formData.append('image', this.selectedFile);
     }
 
-    this.http.post('http://localhost/your-api/edit.php', formData).subscribe({
+    this.http.post('http://localhost/angularapp2/bookingapi/edit.php', formData).subscribe({
       next: () => {
         this.success = 'Бронирование обновлено успешно';
         this.router.navigate(['/booking']);
