@@ -17,9 +17,9 @@ import { BookingService } from '../booking.service';
 })
 export class BookingComponent implements OnInit {
   reservations: BookingItem[] = [];
-  reservation: BookingItem = this.getEmptyReservation();
+  bookings: BookingItem[] = [];  // 👈 добавлено для loadBookings()
+  reservation: BookingItem = this.getEmptyReservation();  // 👈 исправлено
   selectedFile: File | null = null;
-
   success = '';
   error = '';
   isEditing = false;
@@ -31,13 +31,13 @@ export class BookingComponent implements OnInit {
     private router: Router
   ) {}
 
-  goToEdit(id: number) {
-    // Исправлено с 'updatebooking' на 'edit' — совпадает с маршрутом
-    this.router.navigate(['/edit', id]);
-  }
-
   ngOnInit(): void {
     this.getReservations();
+    this.loadBookings();
+  }
+
+  goToEdit(id: number) {
+    this.router.navigate(['/edit', id]);
   }
 
   getReservations(): void {
@@ -93,7 +93,7 @@ export class BookingComponent implements OnInit {
       next: () => {
         this.success = isEdit ? 'Reservation updated successfully' : 'Reservation added successfully';
         this.error = '';
-        this.getReservations();
+        this.getReservations();  // 👈 Обновить список
         this.resetForm(form);
       },
       error: () => {
@@ -116,13 +116,21 @@ export class BookingComponent implements OnInit {
       next: () => {
         this.success = 'Deleted successfully';
         this.error = '';
-        this.getReservations();
+        this.getReservations();  // 👈 Обновить список
       },
       error: () => {
         this.error = 'Failed to delete reservation';
         this.success = '';
       }
     });
+  }
+
+  loadBookings(): void {
+    this.http.get<BookingItem[]>('http://localhost/angularapp2/bookingapi/list.php')
+      .subscribe({
+        next: (data) => this.bookings = data,
+        error: () => this.error = 'Ошибка при загрузке списка бронирований.'
+      });
   }
 
   resetForm(form?: NgForm): void {

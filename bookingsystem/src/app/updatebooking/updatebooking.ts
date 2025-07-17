@@ -99,6 +99,7 @@ export class UpdatebookingComponent implements OnInit {
       next: () => {
         this.success = 'Бронирование обновлено успешно';
         this.router.navigate(['/booking']);
+
       },
       error: (err: HttpErrorResponse) => {
         this.error = err.error?.error || 'Ошибка обновления';
