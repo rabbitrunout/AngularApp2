@@ -56,13 +56,22 @@ export class BookingComponent implements OnInit {
   }
 
   onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files?.length) {
-      this.selectedFile = input.files[0];
-      this.error = '';
-      this.success = '';
-    }
+  const input = event.target as HTMLInputElement;
+  if (input.files?.length) {
+    const file = input.files[0];
+    
+    this.reservationService.uploadImage(file).subscribe({
+      next: (response) => {
+        this.reservation.imageName = response.fileName; // сохранить имя файла
+        this.success = 'Изображение загружено';
+      },
+      error: () => {
+        this.error = 'Ошибка при загрузке изображения';
+      }
+    });
   }
+}
+
 
   addReservation(form: NgForm): void {
     this.resetAlerts();

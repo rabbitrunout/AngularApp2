@@ -38,6 +38,17 @@ export class BookingService {
     return this.http.delete(`${this.baseUrl}/delete.php`, { params });
   }
 
+  uploadImage(file: File): Observable<{ fileName: string }> {
+  const formData = new FormData();
+  formData.append('image', file);
+
+  return this.http.post<{ fileName: string }>(
+    'http://localhost/angularapp2/bookingapi/upload.php',
+    formData
+  );
+}
+
+
   uploadFile(file: File): Observable<any> {
     const formData = new FormData();
     formData.append('image', file);

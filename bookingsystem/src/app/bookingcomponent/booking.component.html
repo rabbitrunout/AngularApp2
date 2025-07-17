@@ -4,71 +4,7 @@
   <div *ngIf="success" class="alert alert-success rounded-3">{{ success }}</div>
   <div *ngIf="error" class="alert alert-danger rounded-3">{{ error }}</div>
 
-  <!-- <form #f="ngForm" (ngSubmit)="addReservation(f)" class="card shadow-sm p-4 mb-4 border-start border-primary border-4 rounded-4 bg-light">
-    <h5 class="mb-3">{{ isEditing ? '✏️ Editing Reservation' : '➕ Add Reservation' }}</h5>
-
-    <div class="mb-3">
-      <label for="location" class="form-label fw-semibold">📍 Location</label>
-      <input
-        id="location"
-        class="form-control rounded-3"
-        [(ngModel)]="reservation.location"
-        name="location"
-        required />
-    </div>
-
-    <div class="row g-3">
-      <div class="col-md-6">
-        <label for="startTime" class="form-label fw-semibold">🕒 Start Time</label>
-        <input
-          id="startTime"
-          type="datetime-local"
-          class="form-control rounded-3"
-          [(ngModel)]="reservation.start_time"
-          name="start_time"
-          required />
-      </div>
-      <div class="col-md-6">
-        <label for="endTime" class="form-label fw-semibold">🕔 End Time</label>
-        <input
-          id="endTime"
-          type="datetime-local"
-          class="form-control rounded-3"
-          [(ngModel)]="reservation.end_time"
-          name="end_time"
-          required />
-      </div>
-    </div>
-
-    <div class="my-3">
-      <label for="image" class="form-label fw-semibold">📷 Upload Image</label>
-      <input
-        type="file"
-        id="image"
-        (change)="onFileSelected($event)"
-        class="form-control rounded-3"
-        accept="image/*" />
-    </div>
-
-    <div class="form-check mb-3">
-      <input
-        type="checkbox"
-        id="complete"
-        name="complete"
-        class="form-check-input"
-        [(ngModel)]="reservation.complete" />
-      <label for="complete" class="form-check-label">✅ Complete</label>
-    </div>
-
-    <div class="d-flex justify-content-between align-items-center mt-3">
-      <button type="submit" class="btn btn-primary rounded-pill px-4">
-        {{ isEditing ? 'Update Reservation' : 'Add Reservation' }}
-      </button>
-      <button type="button" class="btn btn-outline-secondary rounded-pill px-4" (click)="resetForm(f)" *ngIf="isEditing">
-        ❌ Cancel
-      </button>
-    </div>
-  </form> -->
+  
 
   <div class="card shadow-sm rounded-4">
     <div class="card-body">
