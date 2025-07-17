@@ -1,0 +1,62 @@
+.container {
+  max-width: 900px;
+}
+
+h2 {
+  margin-bottom: 20px;
+}
+
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.form-control {
+  flex: 1 1 200px;
+}
+
+.btn {
+  height: 38px;
+  align-self: flex-end;
+}
+
+.card {
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgb(0 0 0 / 0.1);
+}
+
+.card-body {
+  padding: 15px;
+}
+
+.border-bottom {
+  border-bottom: 1px solid #ddd !important;
+}
+
+.d-flex {
+  display: flex !important;
+}
+
+.justify-content-between {
+  justify-content: space-between !important;
+}
+
+.align-items-center {
+  align-items: center !important;
+}
+
+.img-thumbnail {
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.alert {
+  margin-bottom: 15px;
+}
+
+#links > button {    
+    width: 20%;
+    margin-left: 10px;
+}

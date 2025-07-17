@@ -1,32 +1,25 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { NgForm, FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
+import { RouterModule, Router } from '@angular/router';
+
 import { BookingItem } from '../bookingItem';
 import { BookingService } from '../booking.service';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   standalone: true,
   selector: 'app-booking',
-  imports: [HttpClientModule, CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, HttpClientModule, RouterModule],
   providers: [BookingService],
   templateUrl: './booking.component.html',
   styleUrls: ['./booking.component.css']
 })
 export class BookingComponent implements OnInit {
   reservations: BookingItem[] = [];
-  reservation: BookingItem = {
-    ID: 0,
-    location: '',
-    start_time: '',
-    end_time: '',
-    complete: false,
-    imageName: ''
-  };
-
+  reservation: BookingItem = this.getEmptyReservation();
   selectedFile: File | null = null;
+
   success = '';
   error = '';
   isEditing = false;
@@ -34,8 +27,13 @@ export class BookingComponent implements OnInit {
   constructor(
     private reservationService: BookingService,
     private http: HttpClient,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router
   ) {}
+
+  goToEdit(id: number) {
+    this.router.navigate(['/updatebooking', id]);
+  }
 
   ngOnInit(): void {
     this.getReservations();
@@ -62,54 +60,46 @@ export class BookingComponent implements OnInit {
   }
 
   addReservation(form: NgForm): void {
-  this.resetAlerts();
+    this.resetAlerts();
 
-  const isEdit = !!this.reservation.ID;
+    const isEdit = !!this.reservation.ID;
 
-  // Валидация обязательных полей
-  if (!this.reservation.location || !this.reservation.start_time || !this.reservation.end_time) {
-    this.error = 'Please fill in all required fields.';
-    return;
-  }
+    if (!this.reservation.location || !this.reservation.start_time || !this.reservation.end_time) {
+      this.error = 'Please fill in all required fields.';
+      return;
+    }
 
-  if (isEdit) {
-    // Обновление без загрузки файла
-    this.reservationService.edit(this.reservation).subscribe({
-      next: () => {
-        this.success = 'Reservation updated successfully';
-        this.getReservations();
-        this.resetForm(form);
-      },
-      error: () => (this.error = 'Error updating reservation')
-    });
-  } else {
-    // Создание новой записи с возможной загрузкой картинки
     const formData = new FormData();
+    if (isEdit) {
+      formData.append('ID', this.reservation.ID.toString());
+    }
     formData.append('location', this.reservation.location);
     formData.append('start_time', this.reservation.start_time);
     formData.append('end_time', this.reservation.end_time);
     formData.append('complete', this.reservation.complete ? '1' : '0');
+
     if (this.selectedFile) {
-      formData.append('image', this.selectedFile); // 👈 один раз
+      formData.append('image', this.selectedFile);
     }
 
-    this.reservationService.add(formData).subscribe({
+    const action$ = isEdit ? this.reservationService.edit(formData) : this.reservationService.add(formData);
+
+    action$.subscribe({
       next: () => {
-        this.success = 'Reservation added successfully';
+        this.success = isEdit ? 'Reservation updated successfully' : 'Reservation added successfully';
         this.getReservations();
         this.resetForm(form);
       },
-      error: () => (this.error = 'Error creating reservation')
+      error: () => {
+        this.error = isEdit ? 'Error updating reservation' : 'Error creating reservation';
+      }
     });
   }
-}
-
 
   editReservation(item: BookingItem): void {
     this.reservation = { ...item };
     this.isEditing = true;
   }
-
   deleteReservation(ID?: number): void {
     if (!ID) return;
     this.reservationService.delete(ID).subscribe({
@@ -121,8 +111,22 @@ export class BookingComponent implements OnInit {
     });
   }
 
-  resetForm(f?: NgForm): void {
-    this.reservation = {
+  resetForm(form?: NgForm): void {
+    this.reservation = this.getEmptyReservation();
+    this.selectedFile = null;
+    this.isEditing = false;
+    this.success = '';
+    this.error = '';
+    form?.resetForm();
+  }
+
+  resetAlerts(): void {
+    this.success = '';
+    this.error = '';
+  }
+
+  private getEmptyReservation(): BookingItem {
+    return {
       ID: 0,
       location: '',
       start_time: '',
@@ -130,15 +134,5 @@ export class BookingComponent implements OnInit {
       complete: false,
       imageName: ''
     };
-    this.selectedFile = null;
-    this.isEditing = false;
-    this.success = '';
-    this.error = '';
-    f?.resetForm(); // сброс формы Angular
-  }
-
-  resetAlerts(): void {
-    this.error = '';
-    this.success = '';
   }
 }

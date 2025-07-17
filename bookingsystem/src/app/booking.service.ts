@@ -10,30 +10,37 @@ export class BookingService {
 
   constructor(private http: HttpClient) {}
 
-  getAll() {
-    return this.http.get(`${this.baseUrl}/list.php`).pipe(
-      map((res: any) => res.data)
+  getAll(): Observable<BookingItem[]> {
+  return this.http.get<{ data: BookingItem[] }>(`${this.baseUrl}/list.php`).pipe(
+    map(res => res.data)
+  );
+}
+
+
+  getById(id: number): Observable<BookingItem> {
+    const params = new HttpParams().set('ID', id.toString());
+    return this.http.get<{ data: BookingItem }>(`${this.baseUrl}/edit.php`, { params }).pipe(
+      map(res => res.data)
     );
   }
 
- add(formData: FormData): Observable<BookingItem> {
-  return this.http.post<BookingItem>('http://localhost/angularapp2/bookingapi/add.php', formData);
+  add(formData: FormData): Observable<BookingItem> {
+    return this.http.post<BookingItem>(`${this.baseUrl}/add.php`, formData);
+  }
+
+  edit(formData: FormData): Observable<BookingItem> {
+  return this.http.post<BookingItem>(`${this.baseUrl}/edit.php`, formData);
 }
 
 
-
-  edit(reservation: BookingItem) {
-  return this.http.post('http://localhost/angularapp2/bookingapi/edit.php', reservation);
-}
-
-  delete(ID: number) {
+  delete(ID: number): Observable<any> {
     const params = new HttpParams().set('ID', ID.toString());
     return this.http.delete(`${this.baseUrl}/delete.php`, { params });
   }
 
-  uploadFile(file: File) {
+  uploadFile(file: File): Observable<any> {
     const formData = new FormData();
     formData.append('image', file);
-    return this.http.post(`${this.baseUrl}/upload`, formData);
+    return this.http.post(`${this.baseUrl}/upload.php`, formData);
   }
 }

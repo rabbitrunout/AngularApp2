@@ -91,7 +91,8 @@
             alt="Image" />
         </div>
         <div class="d-flex gap-2 col-12 col-md-auto">
-          <button class="btn btn-success btn-sm rounded-pill px-3" (click)="editReservation(item)">✏️ Edit</button>
+         <button class="btn btn-sm btn-primary" [routerLink]="['/updatebooking', reservation.ID]">✏️ Edit</button>
+
           <button class="btn btn-danger btn-sm rounded-pill px-3" (click)="deleteReservation(item.ID)">🗑️ Delete</button>
         </div>
       </div>
