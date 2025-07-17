@@ -5,8 +5,8 @@ import { RouterModule } from '@angular/router';
 @Component({
   standalone: true,
   selector: 'app-about',
+  imports: [CommonModule, RouterModule],
   templateUrl: './about.html',
-  styleUrls: ['./about.css'],
-  imports: [CommonModule, RouterModule]
+  styleUrls: ['./about.css']
 })
 export class About {}

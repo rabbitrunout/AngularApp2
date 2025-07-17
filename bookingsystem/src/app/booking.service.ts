@@ -16,9 +16,11 @@ export class BookingService {
     );
   }
 
-  add(reservation: BookingItem): Observable<BookingItem> {
-  return this.http.post<BookingItem>('http://localhost/angularapp2/bookingapi/add.php', reservation);
+ add(formData: FormData): Observable<BookingItem> {
+  return this.http.post<BookingItem>('http://localhost/angularapp2/bookingapi/add.php', formData);
 }
+
+
 
   edit(reservation: BookingItem) {
   return this.http.post('http://localhost/angularapp2/bookingapi/edit.php', reservation);

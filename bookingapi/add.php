@@ -1,55 +1,61 @@
-    <?php
-
+<?php
 require 'connect.php';
 
-$postdata = file_get_contents("php://input");
+header('Content-Type: application/json');
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 
-if (isset($postdata) && !empty($postdata)) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // Декодируем JSON
-    $request = json_decode($postdata);
+    $location = isset($_POST['location']) ? mysqli_real_escape_string($con, trim($_POST['location'])) : '';
+    $start_time = isset($_POST['start_time']) ? mysqli_real_escape_string($con, trim($_POST['start_time'])) : '';
+    $end_time = isset($_POST['end_time']) ? mysqli_real_escape_string($con, trim($_POST['end_time'])) : '';
+    $complete = isset($_POST['complete']) ? (int) $_POST['complete'] : 0;
 
-    // Валидация данных
-    if (trim($request->location) === '' || trim($request->start_time) === '' || trim($request->end_time) === '') {
+    if ($location === '' || $start_time === '' || $end_time === '') {
         http_response_code(400);
-        echo json_encode(['error' => 'Invalid input']);
-        exit;
+        echo json_encode(['message' => 'Missing required fields']);
+        exit();
     }
 
-    // Экранируем входные данные
-    $location = mysqli_real_escape_string($con, $request->location);
-    $start_time = mysqli_real_escape_string($con, $request->start_time);
-    $end_time = mysqli_real_escape_string($con, $request->end_time);
-    $complete = isset($request->complete) ? (int)$request->complete : 0;
-    $imageName = isset($request->imageName) ? basename(str_replace('\\', '/', $request->imageName)) : '';
+    $imageName = 'placeholder.jpg';
 
-    // Если имя изображения не указано — использовать заглушку
-    if (empty($imageName)) {
-        $imageName = 'placeholder.jpg';
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $target_dir = 'uploads/';
+        $originalName = $_FILES['image']['name'];
+        $tmpName = $_FILES['image']['tmp_name'];
+        $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+        $baseName = pathinfo($originalName, PATHINFO_FILENAME);
+        $finalName = $baseName;
+        $i = 1;
+
+        while (file_exists($target_dir . $finalName . '.' . $ext)) {
+            $finalName = $baseName . '_' . $i++;
+        }
+
+        $finalFilePath = $target_dir . $finalName . '.' . $ext;
+
+        if (move_uploaded_file($tmpName, $finalFilePath)) {
+            $imageName = $finalName . '.' . $ext;
+        } else {
+            http_response_code(500);
+            echo json_encode(['message' => 'Image upload failed']);
+            exit();
+        }
     }
 
-    // SQL-запрос
     $sql = "INSERT INTO reservations (location, start_time, end_time, complete, image_name)
             VALUES ('$location', '$start_time', '$end_time', $complete, '$imageName')";
 
-    // Выполнение и возврат ответа
     if (mysqli_query($con, $sql)) {
-        $id = mysqli_insert_id($con);
-
-        $reservation = [
-            'ID' => $id,
-            'location' => $location,
-            'start_time' => $start_time,
-            'end_time' => $end_time,
-            'complete' => $complete,
-            'imageName' => $imageName
-        ];
-
-        http_response_code(201);
-        echo json_encode($reservation);
+        echo json_encode(['ID' => mysqli_insert_id($con)]);
     } else {
         http_response_code(500);
-        echo json_encode(['error' => 'Database insert failed']);
+        echo json_encode(['message' => 'Insert failed']);
     }
+
+} else {
+    http_response_code(405);
+    echo json_encode(['message' => 'Method Not Allowed']);
 }
 ?>

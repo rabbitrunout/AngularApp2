@@ -1,33 +1,36 @@
 <?php
+require 'connect.php';
 
-  session_start();
-
-  header('Content-Type: application/json');
-  ini_set('display_errors', 1);
-  ini_set('display_startup_errors', 1);
-  error_reporting(E_ALL);
-
-  require 'connect.php';
-
+header('Content-Type: application/json');
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit;
 }
 
-if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
     $uploadDir = 'uploads/';
-    $originalFileName = basename($_FILES['image']['name']);
-    $targetFilePath = $uploadDir . $originalFileName;
+    $fileName = basename($_FILES['image']['name']);
+    $targetPath = $uploadDir . $fileName;
 
-    if (move_uploaded_file($_FILES['image']['tmp_name'], $targetFilePath)) {
-        echo json_encode(['fileName' => $originalFileName]);
+    $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+    $baseName = pathinfo($fileName, PATHINFO_FILENAME);
+    $i = 1;
+    while (file_exists($targetPath)) {
+        $fileName = $baseName . '_' . $i++ . '.' . $ext;
+        $targetPath = $uploadDir . $fileName;
+    }
+
+    if (move_uploaded_file($_FILES['image']['tmp_name'], $targetPath)) {
+        echo json_encode(['fileName' => $fileName]);
     } else {
         http_response_code(500);
-        echo json_encode(['error' => 'Image upload failed']);
+        echo json_encode(['error' => 'Upload failed']);
     }
 } else {
     http_response_code(400);
-    echo json_encode(['error' => 'No image uploaded']);
+    echo json_encode(['error' => 'No file uploaded']);
 }
 ?>
