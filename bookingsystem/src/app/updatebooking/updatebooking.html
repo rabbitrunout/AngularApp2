@@ -2,58 +2,101 @@
   <h2 class="mb-4">Редактировать бронирование</h2>
 
   <!-- Уведомления -->
-  <div *ngIf="success" class="alert alert-success">{{ success }}</div>
-  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+  <div *ngIf="success" class="alert alert-success rounded-3">{{ success }}</div>
+  <div *ngIf="error" class="alert alert-danger rounded-3">{{ error }}</div>
 
-  <form #form="ngForm" (ngSubmit)="updateReservation(form)">
+  <form #form="ngForm" (ngSubmit)="updateReservation(form)" class="card shadow-sm rounded-4 p-4 bg-light">
     <!-- Локация -->
     <div class="mb-3">
-      <label for="location" class="form-label">Локация</label>
-      <input type="text" id="location" name="location" class="form-control"
-             required [(ngModel)]="reservation.location">
+      <label for="location" class="form-label fw-semibold">Локация</label>
+      <input
+        type="text"
+        id="location"
+        name="location"
+        class="form-control rounded-3"
+        required
+        [(ngModel)]="reservation.location"
+      />
     </div>
 
     <!-- Время начала -->
     <div class="mb-3">
-      <label for="start_time" class="form-label">Начало</label>
-      <input type="datetime-local" id="start_time" name="start_time" class="form-control"
-             required [(ngModel)]="reservation.start_time">
+      <label for="start_time" class="form-label fw-semibold">Начало</label>
+      <input
+        type="datetime-local"
+        id="start_time"
+        name="start_time"
+        class="form-control rounded-3"
+        required
+        [(ngModel)]="reservation.start_time"
+      />
     </div>
 
     <!-- Время окончания -->
     <div class="mb-3">
-      <label for="end_time" class="form-label">Окончание</label>
-      <input type="datetime-local" id="end_time" name="end_time" class="form-control"
-             required [(ngModel)]="reservation.end_time">
+      <label for="end_time" class="form-label fw-semibold">Окончание</label>
+      <input
+        type="datetime-local"
+        id="end_time"
+        name="end_time"
+        class="form-control rounded-3"
+        required
+        [(ngModel)]="reservation.end_time"
+      />
     </div>
 
     <!-- Завершено? -->
     <div class="mb-3 form-check">
-      <input type="checkbox" id="complete" name="complete" class="form-check-input"
-             [(ngModel)]="reservation.complete">
-      <label for="complete" class="form-check-label">Завершено</label>
+      <input
+        type="checkbox"
+        id="complete"
+        name="complete"
+        class="form-check-input"
+        [(ngModel)]="reservation.complete"
+      />
+      <label for="complete" class="form-check-label fw-semibold">Завершено</label>
     </div>
 
     <!-- Изображение -->
     <div class="mb-3">
-      <label for="image" class="form-label">Изображение</label>
-      <input type="file" id="image" name="image" class="form-control"
-             (change)="onFileSelected($event)">
+      <label for="image" class="form-label fw-semibold">Изображение</label>
+      <input
+        type="file"
+        id="image"
+        name="image"
+        class="form-control rounded-3"
+        (change)="onFileSelected($event)"
+        accept="image/*"
+      />
     </div>
 
     <!-- Превью -->
     <div class="mb-3" *ngIf="previewUrl">
-      <label class="form-label">Предпросмотр:</label><br>
-      <img [src]="previewUrl" alt="Preview" class="img-thumbnail" style="max-width: 200px;">
+      <label class="form-label fw-semibold">Предпросмотр:</label><br />
+      <img
+        [src]="previewUrl"
+        alt="Preview"
+        class="img-thumbnail"
+        style="max-width: 200px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"
+      />
     </div>
 
     <!-- Кнопки -->
-    <div class="d-flex gap-2">
-      <button type="submit" class="btn btn-primary" [disabled]="form.invalid">💾 Сохранить</button>
-      <button type="button" class="btn btn-secondary" (click)="cancelUpdate()">↩️ Отмена</button>
+    <div class="d-flex gap-3">
+      <button
+        type="submit"
+        class="btn btn-primary rounded-pill px-4"
+        [disabled]="form.invalid"
+      >
+        💾 Сохранить
+      </button>
+      <button
+        type="button"
+        class="btn btn-outline-secondary rounded-pill px-4"
+        (click)="cancelUpdate()"
+      >
+        ↩️ Отмена
+      </button>
     </div>
   </form>
 </div>
-
-
-
