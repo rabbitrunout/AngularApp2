@@ -9,6 +9,7 @@ export const routes: Routes = [
   { path: 'about', component: About },
   { path: 'add', component: Addbooking },
   { path: 'edit/:id', loadComponent: () => import('./updatebooking/updatebooking').then(m => m.UpdatebookingComponent) },
+  
   { path: '', redirectTo: '/booking', pathMatch: 'full' },
   { path: '**', redirectTo: '/booking' }
 ];

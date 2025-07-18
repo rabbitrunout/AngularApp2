@@ -1,5 +1,87 @@
-#about, #links {
-    padding: 10px;
-    border: 2px solid black;
-    margin: 10px;
+.container.py-5 {
+  max-width: 900px;
+  margin: auto;
+  padding: 2rem 1rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+h2.text-center {
+  font-weight: 700;
+  font-size: 2rem;
+  color: #2c3e50;
+  margin-bottom: 1.5rem;
+}
+
+.card.shadow-sm.rounded-4 {
+  background: #f9f9f9;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border-left: 6px solid #0d6efd;
+}
+
+.card-body h4,
+.card-body h5 {
+  color: #34495e;
+  font-weight: 600;
+}
+
+.card-body h4.mb-3 {
+  margin-bottom: 1rem;
+}
+
+.card-body h5.mt-4 {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.card-body p {
+  font-size: 1rem;
+  color: #4a4a4a;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.card-body strong {
+  color: #0d6efd;
+}
+
+.btn.btn-sm.btn-primary.rounded-pill.px-3 {
+  background-color: #0d6efd;
+  border-color: #0a58ca;
+  font-weight: 600;
+  padding: 0.4rem 1.5rem;
+  border-radius: 50px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn.btn-sm.btn-primary.rounded-pill.px-3:hover {
+  background-color: #0a58ca;
+  transform: scale(1.05);
+}
+
+#links {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+#links > button {
+  min-width: 200px;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 0.6rem 1.5rem;
+  border-radius: 12px;
+  background-color: #343a40;
+  color: #fff;
+  border: none;
+  box-shadow: 0 6px 16px rgba(52, 58, 64, 0.4);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  cursor: pointer;
+}
+
+#links > button:hover {
+  background-color: #23272b;
+  transform: scale(1.05);
 }

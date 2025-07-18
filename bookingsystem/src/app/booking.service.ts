@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { HttpClient, HttpParams } from "@angular/common/http";
+import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { map, Observable } from "rxjs";
 import { BookingItem } from "./bookingItem";
 
@@ -32,11 +32,11 @@ export class BookingService {
   return this.http.post<BookingItem>(`${this.baseUrl}/edit.php`, formData);
 }
 
+ delete(ID: number): Observable<any> {
+  return this.http.post(`${this.baseUrl}/delete.php`, { ID });
+}
 
-  delete(ID: number): Observable<any> {
-    const params = new HttpParams().set('ID', ID.toString());
-    return this.http.delete(`${this.baseUrl}/delete.php`, { params });
-  }
+
 
   uploadImage(file: File): Observable<{ fileName: string }> {
   const formData = new FormData();

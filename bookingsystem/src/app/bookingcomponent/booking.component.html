@@ -29,7 +29,10 @@
         <div class="col-2">
           <button class="btn btn-success btn-sm" [routerLink]="['/edit', item.ID]">Edit</button>
 
-          <!-- <button class="btn btn-danger btn-sm" (click)="deleteContact(item.contactID ? item.contactID : 0)">Delete</button> -->
+          <button class="btn btn-danger btn-sm" (click)="deleteReservation(item.ID)">Delete</button>
+
+
+
         </div>
       </div>
     </div>
@@ -37,9 +40,9 @@
 </div>
 
 <div id="links">
-  <button class="btn btn-sm btn-primary" routerLink="/add">
+  <button class="btn btn-primary" routerLink="/add">
     Add Reservation
   </button>
-  <a routerLink="/about" class="btn btn-primary">📄 About Us</a>
+  <button routerLink="/about" class="btn btn-primary">📄 About Us</button>
 
 </div>

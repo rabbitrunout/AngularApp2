@@ -56,7 +56,13 @@ h2 {
   margin-bottom: 15px;
 }
 
-#links > button {    
-    width: 20%;
-    margin-left: 10px;
+#links {
+  margin-top: 2.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1rem;
+  margin-bottom: 20px;
 }
+

@@ -23,6 +23,7 @@ export class BookingComponent implements OnInit {
   success = '';
   error = '';
   isEditing = false;
+  
 
   constructor(
     private reservationService: BookingService,
@@ -119,20 +120,22 @@ export class BookingComponent implements OnInit {
     this.success = '';
   }
 
-  deleteReservation(ID?: number): void {
-    if (!ID) return;
-    this.reservationService.delete(ID).subscribe({
-      next: () => {
-        this.success = 'Deleted successfully';
-        this.error = '';
-        this.getReservations();  // 👈 Обновить список
-      },
-      error: () => {
-        this.error = 'Failed to delete reservation';
-        this.success = '';
-      }
-    });
-  }
+  deleteReservation(ID: number): void {
+  if (!confirm('Are you sure you want to delete this reservation?')) return;
+
+  this.reservationService.delete(ID).subscribe({
+    next: () => {
+      this.success = 'Reservation deleted successfully';
+      this.getReservations();  // Обновить список после удаления
+    },
+    error: (err) => {
+      this.error = 'Failed to delete reservation';
+      console.error(err);
+    }
+  });
+}
+
+
 
   loadBookings(): void {
     this.http.get<BookingItem[]>('http://localhost/angularapp2/bookingapi/list.php')
