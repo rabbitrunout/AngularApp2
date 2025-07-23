@@ -7,37 +7,47 @@ import { RouterModule, Router } from '@angular/router';
 import { BookingItem } from '../bookingItem';
 import { BookingService } from '../booking.service';
 
+import { Auth } from '../services/auth';
+
 @Component({
   standalone: true,
   selector: 'app-booking',
-  imports: [CommonModule, FormsModule, HttpClientModule, RouterModule],
+  imports: [HttpClientModule, CommonModule, FormsModule, RouterModule],
   providers: [BookingService],
   templateUrl: './booking.component.html',
-  styleUrls: ['./booking.component.css']
+  styleUrls: ['./booking.component.css'],
 })
 export class BookingComponent implements OnInit {
   reservations: BookingItem[] = [];
-  bookings: BookingItem[] = [];  // 👈 добавлено для loadBookings()
-  reservation: BookingItem = this.getEmptyReservation();  // 👈 исправлено
+  bookings: BookingItem[] = [];
+  reservation: BookingItem = this.getEmptyReservation();
   selectedFile: File | null = null;
+
   success = '';
   error = '';
   isEditing = false;
-  
+  userName = '';
 
   constructor(
     private reservationService: BookingService,
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
+    public auth: Auth
   ) {}
 
   ngOnInit(): void {
     this.getReservations();
     this.loadBookings();
+    this.userName = localStorage.getItem('userName') || 'Guest';
+    this.cdr.detectChanges();
   }
 
-  goToEdit(id: number) {
+  logout(): void {
+    this.auth.logout();
+  }
+
+  goToEdit(id: number): void {
     this.router.navigate(['/edit', id]);
   }
 
@@ -52,27 +62,28 @@ export class BookingComponent implements OnInit {
       error: () => {
         this.error = 'Failed to load reservations';
         this.success = '';
-      }
+      },
     });
   }
 
   onFileSelected(event: Event): void {
-  const input = event.target as HTMLInputElement;
-  if (input.files?.length) {
-    const file = input.files[0];
-    
-    this.reservationService.uploadImage(file).subscribe({
-      next: (response) => {
-        this.reservation.imageName = response.fileName; // сохранить имя файла
-        this.success = 'Изображение загружено';
-      },
-      error: () => {
-        this.error = 'Ошибка при загрузке изображения';
-      }
-    });
-  }
-}
+    const input = event.target as HTMLInputElement;
+    if (input.files?.length) {
+      const file = input.files[0];
+      this.selectedFile = file;
 
+      this.reservationService.uploadImage(file).subscribe({
+        next: (response) => {
+          this.reservation.imageName = response.fileName;
+          this.success = 'Изображение загружено';
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.error = 'Ошибка при загрузке изображения';
+        },
+      });
+    }
+  }
 
   addReservation(form: NgForm): void {
     this.resetAlerts();
@@ -103,13 +114,13 @@ export class BookingComponent implements OnInit {
       next: () => {
         this.success = isEdit ? 'Reservation updated successfully' : 'Reservation added successfully';
         this.error = '';
-        this.getReservations();  // 👈 Обновить список
+        this.getReservations();
         this.resetForm(form);
       },
       error: () => {
         this.error = isEdit ? 'Error updating reservation' : 'Error creating reservation';
         this.success = '';
-      }
+      },
     });
   }
 
@@ -121,28 +132,33 @@ export class BookingComponent implements OnInit {
   }
 
   deleteReservation(ID: number): void {
-  if (!confirm('Are you sure you want to delete this reservation?')) return;
+    if (!confirm('Are you sure you want to delete this reservation?')) return;
 
-  this.reservationService.delete(ID).subscribe({
-    next: () => {
-      this.success = 'Reservation deleted successfully';
-      this.getReservations();  // Обновить список после удаления
-    },
-    error: (err) => {
-      this.error = 'Failed to delete reservation';
-      console.error(err);
-    }
-  });
-}
+    this.resetAlerts();
 
-
+    this.reservationService.delete(ID).subscribe({
+      next: () => {
+        this.success = 'Reservation deleted successfully';
+        this.getReservations();
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.error = 'Failed to delete reservation';
+        console.error(err);
+      },
+    });
+  }
 
   loadBookings(): void {
-    this.http.get<BookingItem[]>('http://localhost/angularapp2/bookingapi/list.php')
-      .subscribe({
-        next: (data) => this.bookings = data,
-        error: () => this.error = 'Ошибка при загрузке списка бронирований.'
-      });
+    this.http.get<BookingItem[]>('http://localhost/angularapp2/bookingapi/list.php').subscribe({
+      next: (data) => {
+        this.bookings = data;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.error = 'Ошибка при загрузке списка бронирований.';
+      },
+    });
   }
 
   resetForm(form?: NgForm): void {
@@ -165,7 +181,7 @@ export class BookingComponent implements OnInit {
       start_time: '',
       end_time: '',
       complete: false,
-      imageName: ''
+      imageName: '',
     };
   }
 }

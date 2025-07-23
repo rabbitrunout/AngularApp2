@@ -4,13 +4,16 @@ import { HttpClient, HttpClientModule, HttpErrorResponse } from '@angular/common
 import { NgForm, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { BookingItem } from '../bookingItem';
+import { BookingService } from '../booking.service';
+import { Auth } from '../services/auth';
 
 @Component({
   selector: 'app-updatebooking',
   standalone: true,
   imports: [CommonModule, HttpClientModule, FormsModule],
   templateUrl: './updatebooking.html',
-  styleUrls: ['./updatebooking.css']
+  styleUrls: ['./updatebooking.css'],
+  providers: [BookingService]
 })
 export class UpdatebookingComponent implements OnInit {
   bookingID!: number;
@@ -32,6 +35,7 @@ export class UpdatebookingComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private http: HttpClient,
+    public authService: Auth,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
