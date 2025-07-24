@@ -1,47 +1,37 @@
 <?php
+require 'connect.php';
+
 session_start();
-require_once 'connect.php';
+header('Content-Type: application/json');
 
-header('Content-Type: application/json; charset=utf-8');
+$data = json_decode(file_get_contents("php://input"));
 
-$response = ['success' => false, 'message' => 'Ошибка авторизации'];
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $email = trim($_POST['email'] ?? '');
-  $password = trim($_POST['password'] ?? '');
-
-  if (empty($email) || empty($password)) {
-    $response['message'] = 'Email и пароль обязательны';
-    echo json_encode($response);
+if (!isset($data->userName, $data->password)) {
+    echo json_encode(['success' => false, 'message' => 'Missing credentials']);
     exit;
-  }
-
-  $stmt = $con->prepare("SELECT ID, password, userName FROM users WHERE email = ?");
-  $stmt->bind_param("s", $email);
-  $stmt->execute();
-  $stmt->store_result();
-
-  if ($stmt->num_rows === 0) {
-    $response['message'] = 'Пользователь не найден';
-    echo json_encode($response);
-    exit;
-  }
-
-  $stmt->bind_result($userID, $hashedPassword, $userName);
-  $stmt->fetch();
-
-  if (password_verify($password, $hashedPassword)) {
-    $_SESSION['userID'] = $userID;
-    $_SESSION['userName'] = $userName;
-
-    $response['success'] = true;
-    $response['message'] = 'Авторизация успешна';
-  } else {
-    $response['message'] = 'Неверный пароль';
-  }
-} else {
-  $response['message'] = 'Неверный метод запроса';
 }
 
-echo json_encode($response);
+$username = trim($data->userName);
+$password = trim($data->password);
+
+// Fetch the user record
+$query = $con->prepare("SELECT * FROM registrations WHERE userName = ?");
+$query->bind_param("s", $username);
+$query->execute();
+$result = $query->get_result();
+
+if ($result->num_rows === 1) {
+    $user = $result->fetch_assoc();
+
+    if (password_verify($password, $user['password'])) {
+        $_SESSION['loggedIn'] = true;
+        $_SESSION['username'] = $username;
+
+        echo json_encode(['success' => true, 'message' => 'Login successful']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Invalid password']);
+    }
+} else {
+    echo json_encode(['success' => false, 'message' => 'User not found']);
+}
 ?>

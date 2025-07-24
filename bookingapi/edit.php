@@ -1,84 +1,112 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-header('Content-Type: application/json');
 require 'connect.php';
 
-mysqli_set_charset($con, 'utf8mb4');
+header('Content-Type: application/json');
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 
+// Проверка метода запроса
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo json_encode(['error' => 'Method Not Allowed']);
-    exit;
+  http_response_code(405);
+  echo json_encode(['error' => 'Method Not Allowed']);
+  exit;
 }
 
-// Получение данных
+// Проверка и получение ID
 $id = isset($_POST['ID']) ? (int) $_POST['ID'] : 0;
-$location = $_POST['location'] ?? '';
-$start_time = $_POST['start_time'] ?? '';
-$end_time = $_POST['end_time'] ?? '';
+if ($id <= 0) {
+  http_response_code(400);
+  echo json_encode(['error' => 'Invalid reservation ID.']);
+  exit;
+}
+
+// Получение и очистка данных
+$location = trim($_POST['location'] ?? '');
+$start_time = trim($_POST['start_time'] ?? '');
+$end_time = trim($_POST['end_time'] ?? '');
 $complete = isset($_POST['complete']) && $_POST['complete'] == '1' ? 1 : 0;
-$existingImage = $_POST['existingImage'] ?? '';
-$imageName = $existingImage;
+$originalImageName = trim($_POST['existingImage'] ?? 'placeholder.jpg');
 
-// Директория загрузки
+// Проверка обязательных полей
+if ($location === '' || $start_time === '' || $end_time === '') {
+  http_response_code(400);
+  echo json_encode(['error' => 'All fields are required.']);
+  exit;
+}
+
+// Проверка на дубликат (исключая текущую запись)
+$checkSql = "SELECT ID FROM reservations 
+             WHERE location = ? AND start_time = ? AND end_time = ? AND ID != ? 
+             LIMIT 1";
+$checkStmt = $con->prepare($checkSql);
+$checkStmt->bind_param("sssi", $location, $start_time, $end_time, $id);
+$checkStmt->execute();
+$checkResult = $checkStmt->get_result();
+
+if ($checkResult && $checkResult->num_rows > 0) {
+  http_response_code(409);
+  echo json_encode(['error' => 'A reservation already exists for this location and time.']);
+  $checkStmt->close();
+  $con->close();
+  exit;
+}
+$checkStmt->close();
+
+// Обработка загрузки изображения
 $uploadDir = 'uploads/';
+$imageName = $originalImageName;
 
-// Проверка и загрузка нового изображения
 if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-    $originalName = basename($_FILES['image']['name']);
-    $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
-    $baseName = pathinfo($originalName, PATHINFO_FILENAME);
-    $fileName = $originalName;
-    $targetPath = $uploadDir . $fileName;
+  $originalName = $_FILES['image']['name'];
+  $tmpName = $_FILES['image']['tmp_name'];
+  $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+  $baseName = pathinfo($originalName, PATHINFO_FILENAME);
+  $finalName = $baseName;
+  $i = 1;
 
-    // Генерация уникального имени
-    $i = 1;
-    while (file_exists($targetPath)) {
-        $fileName = $baseName . '_' . $i++ . '.' . $ext;
-        $targetPath = $uploadDir . $fileName;
-    }
+  // Генерация уникального имени
+  while (file_exists($uploadDir . $finalName . '.' . $ext)) {
+    $finalName = $baseName . '_' . $i++;
+  }
 
-    // Загрузка новой картинки
-    if (move_uploaded_file($_FILES['image']['tmp_name'], $targetPath)) {
-        // Удаление старой картинки (если имя не совпадает с новым)
-        if (!empty($existingImage) && $existingImage !== $fileName) {
-            $oldImagePath = $uploadDir . $existingImage;
-            if (file_exists($oldImagePath)) {
-                unlink($oldImagePath);
-            }
-        }
-        $imageName = $fileName;
-    } else {
-        http_response_code(500);
-        echo json_encode(['error' => 'Ошибка при загрузке нового изображения']);
-        exit;
+  $finalFilePath = $uploadDir . $finalName . '.' . $ext;
+
+  if (move_uploaded_file($tmpName, $finalFilePath)) {
+    // Удалить старое изображение (если не placeholder)
+    if ($originalImageName !== 'placeholder.jpg') {
+      $oldPath = $uploadDir . $originalImageName;
+      if (file_exists($oldPath)) {
+        unlink($oldPath);
+      }
     }
+    $imageName = $finalName . '.' . $ext;
+  } else {
+    http_response_code(500);
+    echo json_encode(['error' => 'Image upload failed.']);
+    exit;
+  }
 }
 
 // Обновление записи
-$sql = "UPDATE reservations 
-        SET location = ?, start_time = ?, end_time = ?, complete = ?, image_name = ?
-        WHERE ID = ?";
+$updateSql = "UPDATE reservations 
+              SET location = ?, start_time = ?, end_time = ?, complete = ?, image_name = ? 
+              WHERE ID = ?";
 
-$stmt = mysqli_prepare($con, $sql);
+$stmt = $con->prepare($updateSql);
 if (!$stmt) {
-    http_response_code(500);
-    echo json_encode(['error' => 'Prepare failed: ' . mysqli_error($con)]);
-    exit;
+  http_response_code(500);
+  echo json_encode(['error' => 'Failed to prepare update statement.']);
+  exit;
 }
 
-mysqli_stmt_bind_param($stmt, "sssisi", $location, $start_time, $end_time, $complete, $imageName, $id);
+$stmt->bind_param("sssisi", $location, $start_time, $end_time, $complete, $imageName, $id);
 
-if (mysqli_stmt_execute($stmt)) {
-    echo json_encode(['message' => 'Reservation updated and image handled']);
+if ($stmt->execute()) {
+  echo json_encode(['success' => true]);
 } else {
-    http_response_code(500);
-    echo json_encode(['error' => 'Execute failed: ' . mysqli_stmt_error($stmt)]);
+  http_response_code(500);
+  echo json_encode(['error' => 'Failed to update reservation.']);
 }
 
-mysqli_stmt_close($stmt);
-mysqli_close($con);
-?>
+$stmt->close();
+$con->close();

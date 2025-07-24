@@ -1,12 +1,11 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { NgForm, FormsModule } from '@angular/forms';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { FormsModule, NgForm } from '@angular/forms';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { RouterModule, Router } from '@angular/router';
 
 import { BookingItem } from '../bookingItem';
 import { BookingService } from '../booking.service';
-
 import { Auth } from '../services/auth';
 
 @Component({
@@ -18,15 +17,16 @@ import { Auth } from '../services/auth';
   styleUrls: ['./booking.component.css'],
 })
 export class BookingComponent implements OnInit {
-  reservations: BookingItem[] = [];
-  bookings: BookingItem[] = [];
+  public reservations: BookingItem[] = [];
+  public bookings: BookingItem[] = [];
   reservation: BookingItem = this.getEmptyReservation();
+
   selectedFile: File | null = null;
+  userName = '';
 
   success = '';
   error = '';
   isEditing = false;
-  userName = '';
 
   constructor(
     private reservationService: BookingService,
@@ -43,83 +43,53 @@ export class BookingComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
-  logout(): void {
-    this.auth.logout();
-  }
-
-  goToEdit(id: number): void {
-    this.router.navigate(['/edit', id]);
-  }
-
   getReservations(): void {
     this.reservationService.getAll().subscribe({
       next: (data) => {
         this.reservations = data;
         this.success = 'Reservations loaded successfully';
-        this.error = '';
         this.cdr.detectChanges();
       },
       error: () => {
         this.error = 'Failed to load reservations';
-        this.success = '';
       },
     });
   }
 
-  onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files?.length) {
-      const file = input.files[0];
-      this.selectedFile = file;
-
-      this.reservationService.uploadImage(file).subscribe({
-        next: (response) => {
-          this.reservation.imageName = response.fileName;
-          this.success = 'Изображение загружено';
-          this.cdr.detectChanges();
-        },
-        error: () => {
-          this.error = 'Ошибка при загрузке изображения';
-        },
-      });
-    }
-  }
-
   addReservation(form: NgForm): void {
     this.resetAlerts();
-
-    const isEdit = !!this.reservation.ID;
 
     if (!this.reservation.location || !this.reservation.start_time || !this.reservation.end_time) {
       this.error = 'Please fill in all required fields.';
       return;
     }
 
+    const isEdit = !!this.reservation.ID;
+
     const formData = new FormData();
-    if (isEdit) {
-      formData.append('ID', this.reservation.ID.toString());
-    }
+    if (isEdit) formData.append('ID', this.reservation.ID.toString());
     formData.append('location', this.reservation.location);
     formData.append('start_time', this.reservation.start_time);
     formData.append('end_time', this.reservation.end_time);
     formData.append('complete', this.reservation.complete ? '1' : '0');
+    if (this.selectedFile) formData.append('image', this.selectedFile);
 
-    if (this.selectedFile) {
-      formData.append('image', this.selectedFile);
-    }
-
-    const action$ = isEdit ? this.reservationService.edit(formData) : this.reservationService.add(formData);
+    const action$ = isEdit
+      ? this.reservationService.edit(formData)
+      : this.reservationService.add(formData);
 
     action$.subscribe({
       next: () => {
-        this.success = isEdit ? 'Reservation updated successfully' : 'Reservation added successfully';
-        this.error = '';
+        this.success = isEdit
+          ? 'Reservation updated successfully'
+          : 'Reservation added successfully';
         this.getReservations();
         this.resetForm(form);
       },
       error: () => {
-        this.error = isEdit ? 'Error updating reservation' : 'Error creating reservation';
-        this.success = '';
+        this.error = isEdit
+          ? 'Error updating reservation'
+          : 'Error creating reservation';
       },
     });
   }
@@ -127,8 +97,7 @@ export class BookingComponent implements OnInit {
   editReservation(item: BookingItem): void {
     this.reservation = { ...item };
     this.isEditing = true;
-    this.error = '';
-    this.success = '';
+    this.resetAlerts();
   }
 
   deleteReservation(ID: number): void {
@@ -142,23 +111,51 @@ export class BookingComponent implements OnInit {
         this.getReservations();
         this.cdr.detectChanges();
       },
-      error: (err) => {
+      error: () => {
         this.error = 'Failed to delete reservation';
-        console.error(err);
       },
     });
   }
 
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files?.length) {
+      const file = input.files[0];
+      this.selectedFile = file;
+
+      this.reservationService.uploadImage(file).subscribe({
+        next: (response) => {
+          this.reservation.imageName = response.fileName;
+          this.success = 'Image uploaded successfully';
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.error = 'Image upload failed';
+        },
+      });
+    }
+  }
+
   loadBookings(): void {
-    this.http.get<BookingItem[]>('http://localhost/angularapp2/bookingapi/list.php').subscribe({
-      next: (data) => {
-        this.bookings = data;
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.error = 'Ошибка при загрузке списка бронирований.';
-      },
-    });
+    this.http
+      .get<BookingItem[]>('http://localhost/angularapp2/bookingapi/list.php')
+      .subscribe({
+        next: (data) => {
+          this.bookings = data;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.error = 'Failed to load external bookings.';
+        },
+      });
+  }
+
+  logout(): void {
+    this.auth.logout();
+  }
+
+  goToEdit(id: number): void {
+    this.router.navigate(['/edit', id]);
   }
 
   resetForm(form?: NgForm): void {
@@ -183,5 +180,14 @@ export class BookingComponent implements OnInit {
       complete: false,
       imageName: '',
     };
+  }
+
+  formatTime(time: string): string {
+    if (!time) return '';
+    const [hourStr, minute] = time.split(':');
+    let hour = parseInt(hourStr, 10);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    hour = hour % 12 || 12;
+    return `${hour}:${minute} ${ampm}`;
   }
 }

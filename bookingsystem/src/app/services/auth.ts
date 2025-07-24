@@ -1,51 +1,42 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { tap } from 'rxjs/operators';
-import { Observable } from 'rxjs';
-
-// Тип ответа от сервера для логина и регистрации
-export interface AuthResponse {
-  success: boolean;
-  message?: string;
-}
 
 @Injectable({ providedIn: 'root' })
 export class Auth {
-  private baseUrl = 'http://localhost/backend'; // URL к твоему PHP-бэкенду
-
+  private baseUrl = 'http://localhost/angularapp2/bookingapi/';
   isAuthenticated = false;
 
   constructor(private http: HttpClient, private router: Router) {}
 
-  login(credentials: { email: string; password: string }): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.baseUrl}/login.php`, credentials, { withCredentials: true })
-      .pipe(
-        tap(res => {
-          if (res.success) {
-            this.isAuthenticated = true;
-          }
-        })
-      );
+  login(user: any) {
+    return this.http.post<any>(`${this.baseUrl}login.php`, user);
   }
 
-  // Явно можно установить состояние аутентификации
-  setAuth(status: boolean) {
-    this.isAuthenticated = status;
-  }
+   register(user: any) {
+  console.log('Sending user to register:', user);
+  return this.http.post<any>(`${this.baseUrl}register.php`, user);
+}
 
-  register(data: { userName?: string; email: string; password: string }): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.baseUrl}/register.php`, data);
-  }
 
-  checkAuth(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/checkAuth.php`, { withCredentials: true });
-  }
-
-  logout(): void {
-    this.http.get(`${this.baseUrl}/logout.php`, { withCredentials: true }).subscribe(() => {
+  logout() {
+    this.http.get(`${this.baseUrl}logout.php`).subscribe(() => {
       this.isAuthenticated = false;
+      localStorage.removeItem('auth');
       this.router.navigate(['/login']);
     });
+  }
+
+  checkAuth() {
+    return this.http.get<any>(`${this.baseUrl}checkAuth.php`);
+  }
+
+  setAuth(auth: boolean) {
+    this.isAuthenticated = auth;
+    localStorage.setItem('auth', auth ? 'true' : 'false');
+  }
+
+  getAuth(): boolean {
+    return localStorage.getItem('auth') === 'true';
   }
 }

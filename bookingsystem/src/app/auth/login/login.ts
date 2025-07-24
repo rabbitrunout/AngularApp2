@@ -1,45 +1,40 @@
 import { Component, ChangeDetectorRef } from '@angular/core';
 import { Auth } from '../../services/auth';
 import { Router } from '@angular/router';
-import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-
-interface LoginResponse {
-  success: boolean;
-  message?: string;
-}
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [HttpClientModule, CommonModule, FormsModule, RouterModule],
   templateUrl: './login.html',
-  styleUrls: ['./login.css']
+  styleUrl: './login.css'
 })
 export class Login {
-  email = '';
+  userName = '';
   password = '';
   errorMessage = '';
 
   constructor(private auth: Auth, private router: Router, private cdr: ChangeDetectorRef) {}
 
   login() {
-    this.auth.login({ email: this.email, password: this.password }).subscribe({
-      next: (res: LoginResponse) => {
+    this.auth.login({ userName: this.userName, password: this.password }).subscribe({
+      next: res => {
         if (res.success) {
-          this.auth.setAuth(true); // Убедись, что метод есть
-          localStorage.setItem('userEmail', this.email);
-          this.router.navigate(['/booking']);
+          this.auth.setAuth(true);
+          localStorage.setItem('username', this.userName);
+          this.router.navigate(['/bookingcomponent']); // ← Всё правильно
           this.cdr.detectChanges();
         } else {
-          this.errorMessage = res.message || 'Ошибка входа';
+          this.errorMessage = res.message;
           this.cdr.detectChanges();
         }
       },
       error: () => {
-        this.errorMessage = '❌ Неверный email или пароль';
+        this.errorMessage = 'Ошибка сервера при входе.';
         this.cdr.detectChanges();
       }
     });

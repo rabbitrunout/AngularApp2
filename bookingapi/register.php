@@ -1,72 +1,61 @@
+
+
 <?php
-session_start();
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: http://localhost:4200');
+header('Access-Control-Allow-Methods: POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type");
-header('Content-Type: application/json; charset=utf-8');
-
-require_once 'connect.php';
-
-if (!$con) {
-    http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'Ошибка подключения к базе данных']);
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
     exit;
 }
 
-$response = ['success' => false, 'message' => 'Ошибка регистрации'];
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $inputJSON = file_get_contents('php://input');
-  $input = json_decode($inputJSON, true);
+require 'connect.php'; // подключает $con (MySQLi)
 
-  $userName = trim($input['userName'] ?? '');
-  $email = trim($input['email'] ?? '');
-  $password = trim($input['password'] ?? '');
+$input = json_decode(file_get_contents('php://input'), true);
 
-  if (empty($userName) || empty($email) || empty($password)) {
-    $response['message'] = 'Все поля обязательны для заполнения';
-    echo json_encode($response);
+$userName = trim($input['userName'] ?? '');
+$password = trim($input['password'] ?? '');
+$emailAddress = trim($input['emailAddress'] ?? '');
+
+// Валидация
+if (!$userName || !$password || !$emailAddress) {
+    echo json_encode(['success' => false, 'message' => 'Missing required fields']);
     exit;
-  }
+}
 
-  if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    $response['message'] = 'Неверный формат email';
-    echo json_encode($response);
+if (!filter_var($emailAddress, FILTER_VALIDATE_EMAIL)) {
+    echo json_encode(['success' => false, 'message' => 'Invalid email format']);
     exit;
-  }
+}
 
-  $stmt = $con->prepare("SELECT ID FROM users WHERE email = ?");
-  $stmt->bind_param("s", $email);
-  $stmt->execute();
-  $stmt->store_result();
+// Проверка на дубликат
+$stmt = $con->prepare('SELECT COUNT(*) FROM users WHERE userName = ? OR emailAddress = ?');
+$stmt->bind_param('ss', $userName, $emailAddress);
+$stmt->execute();
+$stmt->bind_result($count);
+$stmt->fetch();
+$stmt->close();
 
-  if ($stmt->num_rows > 0) {
-    $response['message'] = 'Пользователь с таким email уже зарегистрирован';
-    echo json_encode($response);
+if ($count > 0) {
+    echo json_encode(['success' => false, 'message' => 'User already exists']);
     exit;
-  }
+}
 
-  $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+// Хеширование и вставка
+$passwordHash = password_hash($password, PASSWORD_DEFAULT);
+$stmt = $con->prepare('INSERT INTO users (userName, password, emailAddress) VALUES (?, ?, ?)');
+$stmt->bind_param('sss', $userName, $passwordHash, $emailAddress);
 
-  $stmt = $con->prepare("INSERT INTO users (userName, email, password) VALUES (?, ?, ?)");
-  $stmt->bind_param("sss", $userName, $email, $hashedPassword);
-
-  if (!$stmt->execute()) {
-    $response['message'] = 'Ошибка при регистрации: ' . $stmt->error;
-    echo json_encode($response);
-    exit;
-  }
-
-  $response['success'] = true;
-  $response['message'] = 'Регистрация прошла успешно';
+if ($stmt->execute()) {
+    echo json_encode(['success' => true, 'message' => 'Registration successful']);
 } else {
-  $response['message'] = 'Неверный метод запроса';
+    echo json_encode(['success' => false, 'message' => 'Database error: ' . $stmt->error]);
 }
 
-echo json_encode($response);
+$stmt->close();
+$con->close();
+
 ?>

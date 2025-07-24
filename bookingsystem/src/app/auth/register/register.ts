@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { Auth } from '../../services/auth';
 import { Router } from '@angular/router';
+import { Auth } from '../../services/auth'; // Убедись, что путь верный
+import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 
 @Component({
@@ -15,45 +15,42 @@ import { RouterModule } from '@angular/router';
 })
 export class Register {
   userName = '';
-  email = '';
   password = '';
-  confirmPassword = '';
+  emailAddress = '';
   errorMessage = '';
   successMessage = '';
 
   constructor(private auth: Auth, private router: Router) {}
 
-  register() {
-    const trimmedUserName = this.userName.trim();
-    const trimmedEmail = this.email.trim();
+  register(): void {
+    const trimmedUsername = this.userName.trim();
     const trimmedPassword = this.password.trim();
-    const trimmedConfirm = this.confirmPassword.trim();
+    const trimmedEmail = this.emailAddress.trim();
 
-    if (!trimmedUserName || !trimmedEmail || !trimmedPassword || !trimmedConfirm) {
-      this.errorMessage = '⚠️ Все поля обязательны';
+    if (!trimmedUsername || !trimmedPassword || !trimmedEmail) {
+      this.errorMessage = 'Все поля обязательны.';
       this.successMessage = '';
       return;
     }
 
-    if (trimmedPassword !== trimmedConfirm) {
-      this.errorMessage = '❗ Пароли не совпадают';
-      this.successMessage = '';
-      return;
-    }
-
-    this.auth.register({ userName: trimmedUserName, email: trimmedEmail, password: trimmedPassword }).subscribe({
-      next: (res: any) => {
+    this.auth.register({
+      userName: trimmedUsername,
+      password: trimmedPassword,
+      emailAddress: trimmedEmail
+    }).subscribe({
+      next: res => {
         if (res.success) {
-          this.successMessage = '✅ Успешная регистрация. Перенаправление...';
+          this.successMessage = 'Регистрация прошла успешно.';
           this.errorMessage = '';
           setTimeout(() => this.router.navigate(['/login']), 1500);
         } else {
-          this.errorMessage = res.message || 'Ошибка регистрации';
+          this.errorMessage = res.message || 'Ошибка регистрации.';
           this.successMessage = '';
         }
       },
-      error: () => {
-        this.errorMessage = '❌ Ошибка сервера при регистрации';
+      error: err => {
+        console.error('Registration error:', err);
+        this.errorMessage = 'Ошибка сервера при регистрации.';
         this.successMessage = '';
       }
     });
