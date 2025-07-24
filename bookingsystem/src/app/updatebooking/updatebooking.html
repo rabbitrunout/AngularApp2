@@ -1,11 +1,11 @@
 <div class="container mt-4">
-  <h2 class="mb-4">Edit Reservation</h2>
+  <h2 class="mb-4">Edit Booking</h2>
 
   <!-- Notifications -->
   <div *ngIf="success" class="alert alert-success rounded-3">{{ success }}</div>
   <div *ngIf="error" class="alert alert-danger rounded-3">{{ error }}</div>
 
-  <form #form="ngForm" (ngSubmit)="updateReservation(form)" class="card shadow-sm rounded-4 p-4 bg-light">
+  <form #form="ngForm" (ngSubmit)="updateReservation(form)" class="card shadow-sm rounded-4 p-4 bg-light" novalidate>
     <!-- Location -->
     <div class="mb-3">
       <label for="location" class="form-label fw-semibold">Location</label>
@@ -16,7 +16,9 @@
         class="form-control rounded-3"
         required
         [(ngModel)]="reservation.location"
+        #location="ngModel"
       />
+      <div *ngIf="location.invalid && location.touched" class="text-danger small">Location is required.</div>
     </div>
 
     <!-- Start Time -->
@@ -29,7 +31,9 @@
         class="form-control rounded-3"
         required
         [(ngModel)]="reservation.start_time"
+        #start_time="ngModel"
       />
+      <div *ngIf="start_time.invalid && start_time.touched" class="text-danger small">Start Time is required.</div>
     </div>
 
     <!-- End Time -->
@@ -42,7 +46,9 @@
         class="form-control rounded-3"
         required
         [(ngModel)]="reservation.end_time"
+        #end_time="ngModel"
       />
+      <div *ngIf="end_time.invalid && end_time.touched" class="text-danger small">End Time is required.</div>
     </div>
 
     <!-- Completed? -->

@@ -1,8 +1,10 @@
 <?php
-require 'connect.php';  // Подключение к базе
+require 'connect.php';
 
-// Получаем ID бронирования из GET-параметра (название параметра изменил на ID)
-$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+header('Access-Control-Allow-Origin: *');
+header('Content-Type: application/json; charset=utf-8');
+
+$id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 if ($id <= 0) {
     http_response_code(400);
@@ -10,24 +12,26 @@ if ($id <= 0) {
     exit;
 }
 
-// SQL-запрос к таблице бронирований (предположим, что таблица называется 'reservations')
 $sql = "SELECT * FROM reservations WHERE ID = {$id} LIMIT 1";
 
-if ($result = mysqli_query($con, $sql)) {
-    if (mysqli_num_rows($result) == 1) {
-        $reservation = mysqli_fetch_assoc($result);
+$result = mysqli_query($con, $sql);
 
-
-        $reservation['imageName'] = $reservation['image_name'];
-        
-        header('Content-Type: application/json');
-        echo json_encode($reservation);
-    } else {
-        http_response_code(404);
-        echo json_encode(['error' => 'Reservation not found']);
-    }
-} else {
+if (!$result) {
     http_response_code(500);
     echo json_encode(['error' => 'Database query failed']);
+    exit;
 }
+
+if (mysqli_num_rows($result) === 0) {
+    http_response_code(404);
+    echo json_encode(['error' => 'Reservation not found']);
+    exit;
+}
+
+$reservation = mysqli_fetch_assoc($result);
+$reservation['imageName'] = $reservation['image_name'];
+unset($reservation['image_name']); // Чтобы не дублировать поле
+
+echo json_encode(['data' => $reservation]);
+
 ?>

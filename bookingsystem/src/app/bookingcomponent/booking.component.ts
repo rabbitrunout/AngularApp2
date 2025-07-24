@@ -58,42 +58,53 @@ export class BookingComponent implements OnInit {
   }
 
   addReservation(form: NgForm): void {
-    this.resetAlerts();
+  this.resetAlerts();
 
-    if (!this.reservation.location || !this.reservation.start_time || !this.reservation.end_time) {
-      this.error = 'Please fill in all required fields.';
-      return;
-    }
-
-    const isEdit = !!this.reservation.ID;
-
-    const formData = new FormData();
-    if (isEdit) formData.append('ID', this.reservation.ID.toString());
-    formData.append('location', this.reservation.location);
-    formData.append('start_time', this.reservation.start_time);
-    formData.append('end_time', this.reservation.end_time);
-    formData.append('complete', this.reservation.complete ? '1' : '0');
-    if (this.selectedFile) formData.append('image', this.selectedFile);
-
-    const action$ = isEdit
-      ? this.reservationService.edit(formData)
-      : this.reservationService.add(formData);
-
-    action$.subscribe({
-      next: () => {
-        this.success = isEdit
-          ? 'Reservation updated successfully'
-          : 'Reservation added successfully';
-        this.getReservations();
-        this.resetForm(form);
-      },
-      error: () => {
-        this.error = isEdit
-          ? 'Error updating reservation'
-          : 'Error creating reservation';
-      },
-    });
+  if (!this.reservation.location || !this.reservation.start_time || !this.reservation.end_time) {
+    this.error = 'Please fill in all required fields.';
+    return;
   }
+
+  const isEdit = !!this.reservation.ID;
+  const formData = new FormData();
+
+  if (isEdit) formData.append('ID', this.reservation.ID.toString());
+  formData.append('location', this.reservation.location);
+  formData.append('start_time', this.reservation.start_time);
+  formData.append('end_time', this.reservation.end_time);
+  formData.append('complete', this.reservation.complete ? '1' : '0');
+
+  if (this.selectedFile) formData.append('image', this.selectedFile);
+
+  const action$ = isEdit
+    ? this.reservationService.edit(formData)
+    : this.reservationService.add(formData);
+
+  action$.subscribe({
+    next: (res: any) => {
+        console.log('Response from server:', res);
+        this.success = 'Reservation added successfully';
+        this.success = isEdit
+        ? 'Reservation updated successfully'
+        : 'Reservation added successfully';
+
+      if (res?.reservation) {
+        this.reservations.unshift(res.reservation);
+      } else {
+        this.getReservations();
+      }
+
+      this.resetForm(form);
+      this.cdr.detectChanges();
+    },
+    error: () => {
+      this.error = isEdit
+        ? 'Error updating reservation'
+        : 'Error creating reservation';
+    },
+  });
+}
+
 
   editReservation(item: BookingItem): void {
     this.reservation = { ...item };

@@ -19,14 +19,9 @@ export class Auth {
   }
 
   logout() {
-    this.http.get(`${this.baseUrl}logout.php`).subscribe(() => {
-      this.isAuthenticated = false;
-      if (typeof window !== 'undefined' && window.localStorage) {
-        localStorage.removeItem('auth');
-      }
-      this.router.navigate(['/login']);
-    });
-  }
+  return this.http.post('http://localhost/angularapp2/bookingapi/logout.php', {});
+}
+
 
   checkAuth() {
     return this.http.get<any>(`${this.baseUrl}checkAuth.php`);

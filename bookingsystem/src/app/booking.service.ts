@@ -14,15 +14,10 @@ export class BookingService {
   return this.http.get<BookingItem[]>('http://localhost/angularapp2/bookingapi/list.php');
 }
 
-
-
-
- getById(id: number): Observable<BookingItem> {
-  const params = new HttpParams().set('id', id.toString());  // 'id', не 'ID'
+getById(id: number): Observable<BookingItem> {
+  const params = new HttpParams().set('id', id.toString());
   return this.http.get<BookingItem>(`${this.baseUrl}/view.php`, { params });
 }
-
-
 
   add(formData: FormData): Observable<BookingItem> {
     return this.http.post<BookingItem>(`${this.baseUrl}/add.php`, formData);

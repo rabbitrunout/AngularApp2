@@ -10,14 +10,36 @@ error_reporting(E_ALL);
 
 require 'connect.php';
 
-// Обработка загрузки изображения
+$uploadDir = 'uploads/';
+
+// Проверяем, что папка для загрузок существует
+if (!is_dir($uploadDir)) {
+    http_response_code(500);
+    echo json_encode(['message' => 'Upload directory does not exist']);
+    exit;
+}
+
 if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-    $uploadDir = 'uploads/';
     $originalFileName = basename($_FILES['image']['name']);
     $ext = strtolower(pathinfo($originalFileName, PATHINFO_EXTENSION));
     $baseName = pathinfo($originalFileName, PATHINFO_FILENAME);
 
-    // Генерация уникального имени файла (если уже существует)
+    // Проверяем допустимые расширения
+    $allowedExt = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    if (!in_array($ext, $allowedExt)) {
+        http_response_code(400);
+        echo json_encode(['message' => 'Unsupported file extension']);
+        exit;
+    }
+
+    // Проверка размера (например, не более 5 МБ)
+    if ($_FILES['image']['size'] > 5 * 1024 * 1024) {
+        http_response_code(400);
+        echo json_encode(['message' => 'File size exceeds 5MB']);
+        exit;
+    }
+
+    // Генерация уникального имени файла
     $newFileName = $originalFileName;
     $targetPath = $uploadDir . $newFileName;
     $i = 1;
@@ -26,18 +48,17 @@ if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         $targetPath = $uploadDir . $newFileName;
     }
 
-    // Перемещение загруженного файла
     if (move_uploaded_file($_FILES['image']['tmp_name'], $targetPath)) {
+        http_response_code(200);
         echo json_encode(['fileName' => $newFileName]);
     } else {
         http_response_code(500);
         echo json_encode(['message' => 'Failed to upload image']);
     }
-
     exit;
 }
 
-// Если нет файла — ошибка
 http_response_code(400);
 echo json_encode(['message' => 'No image uploaded']);
+
 ?>
