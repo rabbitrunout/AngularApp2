@@ -10,11 +10,15 @@ export class BookingService {
 
   constructor(private http: HttpClient) {}
 
-  getAll(): Observable<BookingItem[]> {
-  return this.http.get<{ data: BookingItem[] }>(`${this.baseUrl}/list.php`).pipe(
-    map(res => res.data)
-  );
+ getAll(): Observable<BookingItem[]> {
+  const userName = localStorage.getItem('userName') || '';
+  const params = new HttpParams().set('userName', userName);
+
+  return this.http
+    .get<{ data: BookingItem[] }>(`${this.baseUrl}/list.php`, { params })
+    .pipe(map(res => res.data));
 }
+
 
 
  getById(id: number): Observable<BookingItem> {

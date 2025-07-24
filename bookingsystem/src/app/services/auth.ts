@@ -10,8 +10,9 @@ export class Auth {
   constructor(private http: HttpClient, private router: Router) {}
 
   login(user: any) {
-    return this.http.post<any>(`${this.baseUrl}login.php`, user);
-  }
+  return this.http.post<any>(`${this.baseUrl}login.php`, user);
+}
+
 
    register(user: any) {
   console.log('Sending user to register:', user);
