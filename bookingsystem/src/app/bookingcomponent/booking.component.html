@@ -14,7 +14,7 @@
     <div class="card-body">
       <h4 class="mb-4">📅 Предстоящие бронирования</h4>
 
-      <ng-container *ngIf="reservations?.length > 0; else noReservations">
+      <ng-container *ngIf="reservations && reservations.length > 0; else noReservations">
         <div *ngFor="let item of reservations" class="py-3 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-3">
           <div class="fw-bold col-md-3">{{ item.location }}</div>
           <div class="text-muted col-md-2">{{ item.start_time | date: 'dd.MM.yyyy, HH:mm' }}</div>

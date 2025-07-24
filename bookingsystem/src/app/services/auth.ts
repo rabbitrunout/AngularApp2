@@ -10,20 +10,20 @@ export class Auth {
   constructor(private http: HttpClient, private router: Router) {}
 
   login(user: any) {
-  return this.http.post<any>(`${this.baseUrl}login.php`, user);
-}
+    return this.http.post<any>(`${this.baseUrl}login.php`, user);
+  }
 
-
-   register(user: any) {
-  console.log('Sending user to register:', user);
-  return this.http.post<any>(`${this.baseUrl}register.php`, user);
-}
-
+  register(user: any) {
+    console.log('Sending user to register:', user);
+    return this.http.post<any>(`${this.baseUrl}register.php`, user);
+  }
 
   logout() {
     this.http.get(`${this.baseUrl}logout.php`).subscribe(() => {
       this.isAuthenticated = false;
-      localStorage.removeItem('auth');
+      if (typeof window !== 'undefined' && window.localStorage) {
+        localStorage.removeItem('auth');
+      }
       this.router.navigate(['/login']);
     });
   }
@@ -34,10 +34,15 @@ export class Auth {
 
   setAuth(auth: boolean) {
     this.isAuthenticated = auth;
-    localStorage.setItem('auth', auth ? 'true' : 'false');
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.setItem('auth', auth ? 'true' : 'false');
+    }
   }
 
   getAuth(): boolean {
-    return localStorage.getItem('auth') === 'true';
+    if (typeof window !== 'undefined' && window.localStorage) {
+      return localStorage.getItem('auth') === 'true';
+    }
+    return false;
   }
 }

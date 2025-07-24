@@ -37,11 +37,12 @@ export class BookingComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.getReservations();
-    this.loadBookings();
-    this.userName = localStorage.getItem('userName') || 'Guest';
-    this.cdr.detectChanges();
-  }
+  this.getReservations();
+  this.loadBookings();
+  this.userName = localStorage.getItem('username') || 'Guest';  // исправлено здесь
+  this.cdr.detectChanges();
+}
+
 
   getReservations(): void {
     this.reservationService.getAll().subscribe({

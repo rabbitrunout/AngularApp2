@@ -11,7 +11,7 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [HttpClientModule, CommonModule, FormsModule, RouterModule],
   templateUrl: './login.html',
-  styleUrl: './login.css'
+  styleUrls: ['./login.css']  // исправлено с styleUrl
 })
 export class Login {
   userName = '';
@@ -25,8 +25,8 @@ export class Login {
       next: res => {
         if (res.success) {
           this.auth.setAuth(true);
-          localStorage.setItem('username', this.userName);
-          this.router.navigate(['/bookingcomponent']); // ← Всё правильно
+          localStorage.setItem('userName', this.userName);  // исправлено на 'userName'
+          this.router.navigate(['/booking']);  // проверь правильный путь
           this.cdr.detectChanges();
         } else {
           this.errorMessage = res.message;
@@ -40,3 +40,4 @@ export class Login {
     });
   }
 }
+
