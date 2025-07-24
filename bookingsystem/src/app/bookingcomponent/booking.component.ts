@@ -38,7 +38,7 @@ export class BookingComponent implements OnInit {
 
   ngOnInit(): void {
   this.getReservations();
-  this.loadBookings();
+  // this.loadBookings();
   this.userName = localStorage.getItem('username') || 'Guest';  // исправлено здесь
   this.cdr.detectChanges();
 }
