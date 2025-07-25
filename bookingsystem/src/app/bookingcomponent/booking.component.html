@@ -1,51 +1,42 @@
 <div class="container py-5">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="mb-0">📋 Бронирования</h2>
-    <div>
-      <span class="me-3 fw-bold">👋 Привет, {{ userName }}!</span>
-      <button class="btn btn-outline-danger btn-sm" (click)="logout()">Выйти</button>
-    </div>
-  </div>
+  <h2 class="text-center mb-4">📋 Booking List</h2>
+  <h1>Welcome {{ userName }}!</h1>
+  <button class="btn btn-outline-danger btn-sm" (click)="logout()">Выйти</button>
+
 
   <div *ngIf="success" class="alert alert-success rounded-3">{{ success }}</div>
   <div *ngIf="error" class="alert alert-danger rounded-3">{{ error }}</div>
 
   <div class="card shadow-sm rounded-4">
     <div class="card-body">
-      <h4 class="mb-4">📅 Предстоящие бронирования</h4>
+      <h4 class="mb-4">📅 Upcoming Reservations</h4>
 
-      <ng-container *ngIf="reservations && reservations.length > 0; else noReservations">
-        <div *ngFor="let item of reservations" class="py-3 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-3">
-          <div class="fw-bold col-md-3">{{ item.location }}</div>
-          <div class="text-muted col-md-2">{{ item.start_time | date: 'dd.MM.yyyy, HH:mm' }}</div>
-          <div class="text-muted col-md-2">{{ item.end_time | date: 'dd.MM.yyyy, HH:mm' }}</div>
-          <div class="col-md-2">
-            <span [ngClass]="item.complete ? 'text-success' : 'text-warning'">
-              {{ item.complete ? '✅ Завершено' : '⏳ В ожидании' }}
-            </span>
-          </div>
-          <div class="col-md-2" *ngIf="item.imageName">
-            <img
-              [src]="'http://localhost/angularapp2/bookingapi/uploads/' + item.imageName"
-              class="img-thumbnail rounded-3"
-              style="width: 95px; height: 95px; object-fit: cover"
-              alt="Изображение" />
-          </div>
-          <div class="col-2 d-flex gap-2">
-            <button class="btn btn-success btn-sm" [routerLink]="['/edit', item.ID]">Редактировать</button>
-            <button class="btn btn-danger btn-sm" (click)="deleteReservation(item.ID)">Удалить</button>
-          </div>
+      <div *ngFor="let item of reservations" class="py-3 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div class="fw-bold col-md-3">{{ item.location }}</div>
+        <div class="text-muted col-md-2">{{ item.start_time | date: 'dd.MM.yyyy, HH:mm' }}</div>
+        <div class="text-muted col-md-2">{{ item.end_time | date: 'dd.MM.yyyy, HH:mm' }}</div>
+        <div class="col-md-2">
+          <span [ngClass]="item.complete ? 'text-success' : 'text-warning'">
+            {{ item.complete ? '✅ Done' : '⏳ Pending' }}
+          </span>
         </div>
-      </ng-container>
-
-      <ng-template #noReservations>
-        <p class="text-muted">Нет активных бронирований.</p>
-      </ng-template>
+        <div class="col-md-2" *ngIf="item.imageName">
+          <img
+            [src]="'http://localhost/angularapp2/bookingapi/uploads/' + item.imageName"
+            class="img-thumbnail rounded-3"
+            style="width: 95px; height: 95px; object-fit: cover"
+            alt="Image" />
+        </div>
+        <div class="col-2">
+          <button class="btn btn-success btn-sm" [routerLink]="['/edit', item.ID]">Edit</button>
+          <button class="btn btn-danger btn-sm" (click)="deleteReservation(item.ID)">Delete</button>
+        </div>
+      </div>
     </div>
   </div>
+</div>
 
-  <div class="mt-4 d-flex gap-3">
-    <button class="btn btn-primary" routerLink="/add">➕ Добавить</button>
-    <button class="btn btn-secondary" routerLink="/about">📄 О нас</button>
-  </div>
+<div id="links" class="mt-4 d-flex gap-3">
+  <button class="btn btn-primary" routerLink="/add">Add Reservation</button>
+  <button class="btn btn-primary" routerLink="/about">📄 About Us</button>
 </div>

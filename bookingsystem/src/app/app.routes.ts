@@ -8,11 +8,13 @@ import { Register } from './auth/register/register';
 import { authGuard } from './guards/auth-guard';
 
 export const routes: Routes = [
-  { path: 'bookingcomponent', component: BookingComponent, canActivate: [authGuard] },
+  { path: 'reservations', component: BookingComponent, canActivate: [authGuard] },
   { path: 'add', component: Addbooking, canActivate: [authGuard] },
   { path: 'edit/:id', component: UpdatebookingComponent, canActivate: [authGuard] },
   { path: 'about', component: About },
   { path: 'login', component: Login },
   { path: 'register', component: Register },
-  { path: '**', redirectTo: '/bookingcomponent', pathMatch: 'full' }
+
+  { path: '', redirectTo: '/reservations', pathMatch: 'full' },
+  { path: '**', redirectTo: '/reservations' }
 ];

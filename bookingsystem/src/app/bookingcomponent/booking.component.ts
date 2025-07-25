@@ -57,11 +57,33 @@ export class BookingComponent implements OnInit {
     });
   }
 
+  private isDuplicateReservation(newReservation: BookingItem): boolean {
+  return this.reservations.some(reservation => 
+    reservation.location === newReservation.location && 
+    this.timesOverlap(
+      new Date(reservation.start_time), 
+      new Date(reservation.end_time), 
+      new Date(newReservation.start_time), 
+      new Date(newReservation.end_time)
+    )
+  );
+}
+
+private timesOverlap(start1: Date, end1: Date, start2: Date, end2: Date): boolean {
+  return start1 < end2 && start2 < end1;
+}
+
+
   addReservation(form: NgForm): void {
   this.resetAlerts();
 
   if (!this.reservation.location || !this.reservation.start_time || !this.reservation.end_time) {
     this.error = 'Please fill in all required fields.';
+    return;
+  }
+
+  if (!this.isEditing && this.isDuplicateReservation(this.reservation)) {
+    this.error = 'Ошибка: уже существует бронирование с таким местом и временем.';
     return;
   }
 
@@ -82,29 +104,41 @@ export class BookingComponent implements OnInit {
 
   action$.subscribe({
     next: (res: any) => {
-        console.log('Response from server:', res);
-        this.success = 'Reservation added successfully';
-        this.success = isEdit
-        ? 'Reservation updated successfully'
-        : 'Reservation added successfully';
+      this.success = isEdit
+        ? 'Бронирование успешно обновлено.'
+        : 'Бронирование успешно добавлено.';
 
       if (res?.reservation) {
-        this.reservations.unshift(res.reservation);
+        if (isEdit) {
+          const index = this.reservations.findIndex(r => r.ID === res.reservation.ID);
+          if (index !== -1) this.reservations[index] = res.reservation;
+        } else {
+          this.reservations.unshift(res.reservation);
+        }
       } else {
         this.getReservations();
       }
 
       this.resetForm(form);
       this.cdr.detectChanges();
+      
+      this.router.navigate(['/reservations']);
+      // ✅ Добавьте переход на страницу списка бронирований:
+      if (!isEdit) {
+        setTimeout(() => {
+          
+        }, 1000); // задержка 1 секунда, чтобы успело показать сообщение
+      }
     },
-    error: () => {
-      this.error = isEdit
-        ? 'Error updating reservation'
-        : 'Error creating reservation';
-    },
+    error: (err) => {
+      if (err.status === 409) {
+        this.error = '⚠️ Такое бронирование уже существует.';
+      } else {
+        this.error = 'Ошибка при добавлении бронирования.';
+      }
+    }
   });
 }
-
 
   editReservation(item: BookingItem): void {
     this.reservation = { ...item };
@@ -162,9 +196,15 @@ export class BookingComponent implements OnInit {
       });
   }
 
-  logout(): void {
-    this.auth.logout();
-  }
+ logout(): void {
+  // Очистка токена / данных пользователя
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+
+  // Переход на страницу входа (или главную)
+  this.router.navigate(['/login']);
+}
+
 
   goToEdit(id: number): void {
     this.router.navigate(['/edit', id]);
@@ -194,6 +234,7 @@ export class BookingComponent implements OnInit {
     };
   }
 
+  
   formatTime(time: string): string {
     if (!time) return '';
     const [hourStr, minute] = time.split(':');

@@ -53,19 +53,26 @@ if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
     }
 }
 
+
 // Проверка дубликата
 $checkSql = "SELECT 1 FROM reservations 
-             WHERE location = '{$location}' 
-               AND start_time = '{$start_time}' 
-               AND end_time = '{$end_time}' 
-             LIMIT 1";
-$checkResult = mysqli_query($con, $checkSql);
+             WHERE location = ? AND (start_time < ? AND end_time > ?) LIMIT 1";
+$stmt = $con->prepare($checkSql);
+$stmt->bind_param("sss", $location, $end_time, $start_time); // обратите внимание на порядок
 
-if (mysqli_num_rows($checkResult) > 0) {
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result && $result->num_rows > 0) {
     http_response_code(409);
     echo json_encode(['error' => 'A reservation already exists for this location and time.']);
     exit;
 }
+
+
+$stmt->close();
+
+
 
 // Вставка записи
 $sql = "INSERT INTO reservations (location, start_time, end_time, complete, image_name)

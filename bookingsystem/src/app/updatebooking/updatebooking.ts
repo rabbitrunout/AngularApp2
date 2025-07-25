@@ -153,10 +153,7 @@ export class UpdatebookingComponent implements OnInit {
     this.cdr.detectChanges();
   }
 });
-
-
 }
-
 
   cancelUpdate(): void {
     this.router.navigate(['/booking']);
