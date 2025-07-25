@@ -83,7 +83,7 @@ private timesOverlap(start1: Date, end1: Date, start2: Date, end2: Date): boolea
   }
 
   if (!this.isEditing && this.isDuplicateReservation(this.reservation)) {
-    this.error = 'Ошибка: уже существует бронирование с таким местом и временем.';
+    this.error = 'Error: there is already a booking with this location and time.';
     return;
   }
 
@@ -105,8 +105,8 @@ private timesOverlap(start1: Date, end1: Date, start2: Date, end2: Date): boolea
   action$.subscribe({
     next: (res: any) => {
       this.success = isEdit
-        ? 'Бронирование успешно обновлено.'
-        : 'Бронирование успешно добавлено.';
+        ? 'The booking has been successfully updated.'
+        : 'The booking was successfully added.';
 
       if (res?.reservation) {
         if (isEdit) {
@@ -121,7 +121,7 @@ private timesOverlap(start1: Date, end1: Date, start2: Date, end2: Date): boolea
 
       this.resetForm(form);
       this.cdr.detectChanges();
-      
+
       this.router.navigate(['/reservations']);
       // ✅ Добавьте переход на страницу списка бронирований:
       if (!isEdit) {
@@ -132,9 +132,9 @@ private timesOverlap(start1: Date, end1: Date, start2: Date, end2: Date): boolea
     },
     error: (err) => {
       if (err.status === 409) {
-        this.error = '⚠️ Такое бронирование уже существует.';
+        this.error = '⚠️ Such a reservation already exists.';
       } else {
-        this.error = 'Ошибка при добавлении бронирования.';
+        this.error = 'Error when adding a reservation.';
       }
     }
   });

@@ -133,22 +133,22 @@ export class UpdatebookingComponent implements OnInit {
       console.log('Parsed JSON:', response);
 
       if (response && response.success) {
-        this.success = response.message || 'Бронирование обновлено успешно';
+        this.success = response.message || 'Booking updated successfully';
         this.error = '';
         setTimeout(() => this.router.navigate(['/booking']), 1000);
       } else {
-        this.error = response?.error || 'Ошибка обновления';
+        this.error = response?.error || 'Update error';
         this.success = '';
       }
     } catch (e) {
       console.error('JSON parse error:', e, responseText);
-      this.error = 'Ошибка обновления (некорректный JSON)';
+      this.error = 'Update error (incorrect JSON)';
       this.success = '';
     }
   },
   error: (err: HttpErrorResponse) => {
     console.error('POST error:', err);
-    this.error = err.error?.error || 'Ошибка обновления';
+    this.error = err.error?.error || 'Update error';
     this.success = '';
     this.cdr.detectChanges();
   }

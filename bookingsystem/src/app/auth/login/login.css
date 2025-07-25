@@ -1,76 +1,80 @@
-.form-container {
-  max-width: 400px;
-  margin: 60px auto;
-  padding: 30px;
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  text-align: center;
+.container {
+  width: 800px;
+  margin: auto;
+  padding: 2rem;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #fefefe;
 }
- 
-.form-container h2 {
-  margin-bottom: 20px;
-  font-size: 24px;
-  color: #333;
+
+h2 {
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 1.5rem;
+  text-align: center;
 }
- 
-.form-container input[type="text"],
-.form-container input[type="email"],
-.form-container input[type="password"] {
-  width: 100%;
-  padding: 12px 15px;
-  margin: 10px 0;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  box-sizing: border-box;
-  transition: border-color 0.3s;
+
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 1rem;
 }
- 
-.form-container input:focus {
-  border-color: #007bff;
+
+.form-control {
+  flex: 1 1 100%;
+  border-radius: 12px;
+  border: 1.5px solid #ced4da;
+  padding: 0.75rem;
+  font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus {
   outline: none;
+  border-color: #0d6efd;
+  box-shadow: 0 0 6px rgba(13, 110, 253, 0.4);
 }
- 
-.form-container button[type="submit"] {
-  width: 100%;
-  padding: 12px;
-  margin-top: 15px;
-  background-color: #007bff;
+
+.btn {
+  height: 42px;
+  border-radius: 50px;
+  font-weight: 600;
+  padding: 0.6rem 2.5rem;
+  background-color: #0d6efd;
   border: none;
-  color: #fff;
-  border-radius: 8px;
-  font-size: 16px;
+  color: white;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 6px 12px rgba(13, 110, 253, 0.3);
 }
- 
-.form-container button[type="submit"]:hover {
-  background-color: #0056b3;
+
+.btn:hover:not(:disabled) {
+  background-color: #0a58ca;
+  transform: scale(1.05);
 }
- 
-.btn.btn-outline-primary {
-  position: absolute;
-  top: 20px;
-  right: 20px;
+
+.btn-outline-secondary {
   background-color: transparent;
-  border: 2px solid #007bff;
-  color: #007bff;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-decoration: none;
+  border: 2px solid #6c757d;
+  color: #6c757d;
+  margin-left: auto;
 }
- 
-.btn.btn-outline-primary:hover {
-  background-color: #007bff;
-  color: #fff;
+
+.btn-outline-secondary:hover {
+  background-color: #6c757d;
+  color: white;
 }
- 
-.error {
-  margin-top: 15px;
-  color: #dc3545;
-  font-size: 14px;
+
+.alert {
+  font-weight: 500;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-top: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.alert-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1.5px solid #f5c6cb;
 }
