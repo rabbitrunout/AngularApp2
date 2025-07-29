@@ -1,5 +1,5 @@
 <div class="container card">
-  <h2>Log in to the system</h2>
+  <h2>Вход в систему</h2>
 
   <form (ngSubmit)="login()" #form="ngForm">
     <div class="form-row">
@@ -10,6 +10,7 @@
         name="username"
         placeholder="Имя пользователя"
         required
+        [disabled]="waitTime > 0"
       />
     </div>
 
@@ -21,17 +22,31 @@
         name="password"
         placeholder="Пароль"
         required
+        [disabled]="waitTime > 0"
       />
     </div>
 
-    <div class="form-row">
-      <button type="submit" class="btn" [disabled]="form.invalid">Login</button>
+    <div class="form-row" style="justify-content: space-between; align-items: center;">
+      <button class="btn" type="submit" [disabled]="waitTime > 0">
+        Войти
+      </button>
+
       <button routerLink="/register" class="btn btn-outline-secondary" type="button">
-        Registration
+        Регистрация
       </button>
     </div>
 
-    <div *ngIf="errorMessage" class="alert alert-danger">
+    <div *ngIf="waitTime > 0" class="alert alert-danger mt-3 text-center">
+      Слишком много неудачных попыток.<br />Попробуйте снова через <strong>{{ waitTime }}</strong> сек.
+    </div>
+    <div *ngIf="waitTime > 0" class="progress-bar-container">
+  <div
+    class="progress-bar"
+    [style.width.%]="100 * (300 - waitTime) / 300"
+  ></div>
+</div>
+
+    <div *ngIf="errorMessage && waitTime <= 0" class="alert alert-danger mt-3 text-center">
       {{ errorMessage }}
     </div>
   </form>

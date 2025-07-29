@@ -37,6 +37,9 @@ $start_time = trim($_POST['start_time'] ?? '');
 $end_time = trim($_POST['end_time'] ?? '');
 $complete = (isset($_POST['complete']) && ($_POST['complete'] == '1' || $_POST['complete'] === 1)) ? 1 : 0;
 $existingImage = trim($_POST['existingImage'] ?? 'placeholder.jpg');
+$originalImageName = mysqli_real_escape_string($con, $_POST['oldImageName'] ?? '');
+$imageName = $originalImageName;
+
 
 // Проверка обязательных полей
 if ($location === '' || $start_time === '' || $end_time === '') {

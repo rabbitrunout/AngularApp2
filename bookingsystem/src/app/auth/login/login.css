@@ -78,3 +78,17 @@ h2 {
   color: #721c24;
   border: 1.5px solid #f5c6cb;
 }
+.progress-bar-container {
+  width: 100%;
+  background: #eee;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: #dc3545; /* Bootstrap danger color */
+  transition: width 1s linear;
+}
