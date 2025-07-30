@@ -25,7 +25,7 @@ if (!isset($data->ID) || (int)$data->ID < 1) {
 
 $ID = mysqli_real_escape_string($con, (int)$data->ID);
 
-// Получаем имя изображения перед удалением
+// We get the name of the image before deleting it
 $getImageQuery = "SELECT imageName FROM reservations WHERE ID = '$ID' LIMIT 1";
 $result = mysqli_query($con, $getImageQuery);
 
@@ -48,7 +48,7 @@ if ($result && mysqli_num_rows($result) > 0) {
 $sql = "DELETE FROM reservations WHERE ID = '$ID' LIMIT 1";
 
 if (mysqli_query($con, $sql)) {
-    http_response_code(204); // No Content, успешно удалено
+    http_response_code(204); // No Content, successfully deleted
     exit();
 } else {
     http_response_code(500);

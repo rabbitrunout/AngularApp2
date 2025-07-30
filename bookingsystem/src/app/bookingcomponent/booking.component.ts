@@ -124,11 +124,11 @@ private timesOverlap(start1: Date, end1: Date, start2: Date, end2: Date): boolea
       this.cdr.detectChanges();
 
       this.router.navigate(['/reservations']);
-      // ✅ Добавьте переход на страницу списка бронирований:
+      // ✅ Add a link to the booking list page:
       if (!isEdit) {
         setTimeout(() => {
           
-        }, 1000); // задержка 1 секунда, чтобы успело показать сообщение
+        }, 1000); // There is a 1-second delay to show the message.
       }
     },
     error: (err) => {
@@ -198,11 +198,11 @@ private timesOverlap(start1: Date, end1: Date, start2: Date, end2: Date): boolea
   }
 
  logout(): void {
-  // Очистка токена / данных пользователя
+  // Clearing the user's token/data
   localStorage.removeItem('token');
   localStorage.removeItem('user');
 
-  // Переход на страницу входа (или главную)
+  // Go to the login page (or the main one)
   this.router.navigate(['/login']);
 }
 

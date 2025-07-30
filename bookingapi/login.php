@@ -48,7 +48,7 @@ if ($failedAttempts >= 3 && $lastFailed !== null) {
         $remaining = 300 - $diff;
         echo json_encode([
             'success' => false,
-            'message' => "Слишком много неудачных попыток. Подождите {$remaining} секунд.",
+            'message' => "Too many failed attempts. Wait {$remaining} seconds.",
             'waitTime' => $remaining
         ]);
         exit;
@@ -83,13 +83,13 @@ if (password_verify($password, $user['password'])) {
     if ($remainingAttempts === 0) {
         echo json_encode([
             'success' => false,
-            'message' => 'Слишком много неудачных попыток. Подождите 300 секунд.',
+            'message' => 'Too many failed attempts. Wait 5 minutes.',
             'waitTime' => 300
         ]);
     } else {
         echo json_encode([
             'success' => false,
-            'message' => 'Неверный пароль.',
+            'message' => 'Invalid password.',
             'remainingAttempts' => $remainingAttempts
         ]);
     }

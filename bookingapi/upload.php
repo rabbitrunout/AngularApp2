@@ -12,7 +12,7 @@ require 'connect.php';
 
 $uploadDir = 'uploads/';
 
-// Проверяем, что папка для загрузок существует
+// We check that the folder for downloads exists.
 if (!is_dir($uploadDir)) {
     http_response_code(500);
     echo json_encode(['message' => 'Upload directory does not exist']);
@@ -24,7 +24,7 @@ if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
     $ext = strtolower(pathinfo($originalFileName, PATHINFO_EXTENSION));
     $baseName = pathinfo($originalFileName, PATHINFO_FILENAME);
 
-    // Проверяем допустимые расширения
+    // Checking the allowed extensions
     $allowedExt = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
     if (!in_array($ext, $allowedExt)) {
         http_response_code(400);
@@ -32,14 +32,14 @@ if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         exit;
     }
 
-    // Проверка размера (например, не более 5 МБ)
+    // Checking the size (for example, no more than 5 MB)
     if ($_FILES['image']['size'] > 5 * 1024 * 1024) {
         http_response_code(400);
         echo json_encode(['message' => 'File size exceeds 5MB']);
         exit;
     }
 
-    // Генерация уникального имени файла
+    // Generating a unique file name
     $newFileName = $originalFileName;
     $targetPath = $uploadDir . $newFileName;
     $i = 1;

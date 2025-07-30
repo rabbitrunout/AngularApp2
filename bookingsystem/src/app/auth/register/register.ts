@@ -28,7 +28,7 @@ export class Register {
     const trimmedEmail = this.emailAddress.trim();
 
     if (!trimmedUsername || !trimmedPassword || !trimmedEmail) {
-      this.errorMessage = 'Все поля обязательны.';
+      this.errorMessage = 'All fields are required.';
       this.successMessage = '';
       return;
     }
@@ -40,17 +40,17 @@ export class Register {
     }).subscribe({
       next: res => {
         if (res.success) {
-          this.successMessage = 'Регистрация прошла успешно.';
+          this.successMessage = 'Registration was successful.';
           this.errorMessage = '';
           setTimeout(() => this.router.navigate(['/login']), 1500);
         } else {
-          this.errorMessage = res.message || 'Ошибка регистрации.';
+          this.errorMessage = res.message || 'Registration error.';
           this.successMessage = '';
         }
       },
       error: err => {
         console.error('Registration error:', err);
-        this.errorMessage = 'Ошибка сервера при регистрации.';
+        this.errorMessage = 'Server error during registration.';
         this.successMessage = '';
       }
     });

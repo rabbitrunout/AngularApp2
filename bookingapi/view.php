@@ -30,7 +30,7 @@ if (mysqli_num_rows($result) === 0) {
 
 $reservation = mysqli_fetch_assoc($result);
 $reservation['imageName'] = $reservation['image_name'];
-unset($reservation['image_name']); // Чтобы не дублировать поле
+unset($reservation['image_name']); // To avoid duplicating the field
 
 echo json_encode(['data' => $reservation]);
 

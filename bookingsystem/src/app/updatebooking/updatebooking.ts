@@ -77,7 +77,7 @@ export class UpdatebookingComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading booking data', err);
-        this.error = 'Ошибка при загрузке данных бронирования.';
+        this.error = 'Error when uploading booking data.';
       }
     });
 }

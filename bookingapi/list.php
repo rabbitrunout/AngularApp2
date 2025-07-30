@@ -1,12 +1,12 @@
 <?php
-// Разрешить доступ с твоего фронтенд-домена (Angular dev server)
+// Allow access from your frontend domain (Angular dev server)
 header("Access-Control-Allow-Origin: http://localhost:4200");
 
-// Если запросы могут быть с разными методами или с куками — добавить:
+// If the requests can be with different methods or with cookies, add:
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
-// Опционально, если с куками:
+// Optionally, if with cookies:
 // header("Access-Control-Allow-Credentials: true");
 
 ini_set('display_errors', 1);

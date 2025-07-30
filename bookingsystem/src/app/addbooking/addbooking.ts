@@ -37,7 +37,7 @@ export class Addbooking {
   }
 
   getReservations() {
-    // Можно обновить список, если нужно
+    // You can update the list if necessary.
   }
 
   addReservation(form: NgForm): void {
@@ -45,13 +45,13 @@ export class Addbooking {
 
     const isEdit = !!this.reservation.ID;
 
-    // Проверка на обязательные поля
+    // Checking for required fields
     if (!this.reservation.location || !this.reservation.start_time || !this.reservation.end_time) {
       this.error = 'Please fill in all required fields.';
       return;
     }
 
-    // Для редактирования (POST с JSON, не FormData)
+    // For editing purposesя (POST with JSON, no FormData)
     if (isEdit) {
       this.reservationService.edit(this.reservation).subscribe({
         next: () => {
@@ -65,7 +65,7 @@ export class Addbooking {
         }
       });
     } else {
-      // Добавление — используется FormData
+      // Addendum — used FormData
       const formData = new FormData();
       formData.append('location', this.reservation.location);
       formData.append('start_time', this.reservation.start_time);

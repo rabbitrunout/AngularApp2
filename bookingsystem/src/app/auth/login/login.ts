@@ -38,10 +38,10 @@ export class Login {
           localStorage.setItem('userName', this.userName);
           this.router.navigate(['/booking']);
         } else {
-          this.errorMessage = res.message || 'Ошибка входа';
+          this.errorMessage = res.message || 'Login error';
 
           if (res.remainingAttempts !== undefined) {
-            this.errorMessage += ` Осталось попыток: ${res.remainingAttempts}`;
+            this.errorMessage += ` There are still attempts left: ${res.remainingAttempts}`;
           }
 
           if (res.waitTime) {
@@ -54,7 +54,7 @@ export class Login {
       },
       error: err => {
         console.error('Server error:', err);
-        this.errorMessage = 'Ошибка сервера при входе.';
+        this.errorMessage = 'Server error when logging in.';
         this.cdr.detectChanges();
       }
     });

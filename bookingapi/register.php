@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 
-require 'connect.php'; // подключает $con (MySQLi)
+require 'connect.php'; // connects $con (MySQLi)
 
 $input = json_decode(file_get_contents('php://input'), true);
 
@@ -20,7 +20,7 @@ $userName = trim($input['userName'] ?? '');
 $password = trim($input['password'] ?? '');
 $emailAddress = trim($input['emailAddress'] ?? '');
 
-// Валидация
+// Validation
 if (!$userName || !$password || !$emailAddress) {
     echo json_encode(['success' => false, 'message' => 'Missing required fields']);
     exit;
@@ -31,7 +31,7 @@ if (!filter_var($emailAddress, FILTER_VALIDATE_EMAIL)) {
     exit;
 }
 
-// Проверка на дубликат
+// Checking for a duplicate
 $stmt = $con->prepare('SELECT COUNT(*) FROM users WHERE userName = ? OR emailAddress = ?');
 $stmt->bind_param('ss', $userName, $emailAddress);
 $stmt->execute();
@@ -44,7 +44,7 @@ if ($count > 0) {
     exit;
 }
 
-// Хеширование и вставка
+// Hashing and insertion
 $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 $stmt = $con->prepare('INSERT INTO users (userName, password, emailAddress) VALUES (?, ?, ?)');
 $stmt->bind_param('sss', $userName, $passwordHash, $emailAddress);

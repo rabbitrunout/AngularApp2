@@ -2,29 +2,29 @@
 require 'connect.php';
 
 header('Content-Type: application/json; charset=utf-8');
-header("Access-Control-Allow-Origin: *"); // только для разработки
+header("Access-Control-Allow-Origin: *"); 
 
-// Проверка метода
+// Checking the method
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode(['error' => 'Method Not Allowed']);
     exit;
 }
 
-// Получение данных
+// Getting data
 $location   = isset($_POST['location']) ? mysqli_real_escape_string($con, trim($_POST['location'])) : '';
 $start_time = isset($_POST['start_time']) ? mysqli_real_escape_string($con, trim($_POST['start_time'])) : '';
 $end_time   = isset($_POST['end_time']) ? mysqli_real_escape_string($con, trim($_POST['end_time'])) : '';
 $complete   = isset($_POST['complete']) ? (int)$_POST['complete'] : 0;
 
-// Валидация
+// Validation
 if ($location === '' || $start_time === '' || $end_time === '') {
     http_response_code(400);
     echo json_encode(['error' => 'Missing required fields']);
     exit;
 }
 
-// Работа с изображением
+// Working with an image
 $imageName = 'placeholder.jpg';
 if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
     $target_dir = 'uploads/';
@@ -54,11 +54,11 @@ if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
 }
 
 
-// Проверка дубликата
+// Duplicate verification
 $checkSql = "SELECT 1 FROM reservations 
              WHERE location = ? AND (start_time < ? AND end_time > ?) LIMIT 1";
 $stmt = $con->prepare($checkSql);
-$stmt->bind_param("sss", $location, $end_time, $start_time); // обратите внимание на порядок
+$stmt->bind_param("sss", $location, $end_time, $start_time); // pay attention to the order
 
 $stmt->execute();
 $result = $stmt->get_result();
@@ -72,9 +72,7 @@ if ($result && $result->num_rows > 0) {
 
 $stmt->close();
 
-
-
-// Вставка записи
+// Inserting a record
 $sql = "INSERT INTO reservations (location, start_time, end_time, complete, image_name)
         VALUES ('$location', '$start_time', '$end_time', $complete, '$imageName')";
 

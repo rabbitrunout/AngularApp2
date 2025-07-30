@@ -1,5 +1,5 @@
 <?php
-// CORS и заголовки
+// CORS and the headlines
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: Content-Type');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
@@ -16,14 +16,14 @@ require 'connect.php';
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-// Только POST-запрос
+// POST request only
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode(['error' => 'Method Not Allowed']);
     exit;
 }
 
-// Получение и валидация ID
+// Getting and validating an ID
 $id = isset($_POST['ID']) ? (int)$_POST['ID'] : 0;
 if ($id <= 0) {
     http_response_code(400);
@@ -31,7 +31,7 @@ if ($id <= 0) {
     exit;
 }
 
-// Получение данных
+// Getting data
 $location = trim($_POST['location'] ?? '');
 $start_time = trim($_POST['start_time'] ?? '');
 $end_time = trim($_POST['end_time'] ?? '');
@@ -42,14 +42,14 @@ $originalImageName = mysqli_real_escape_string($con, $_POST['oldImageName'] ?? '
 $imageName = $originalImageName;
 
 
-// Проверка обязательных полей
+// Checking required fields
 if ($location === '' || $start_time === '' || $end_time === '') {
     http_response_code(400);
     echo json_encode(['error' => 'All fields are required.']);
     exit;
 }
 
-// Проверка на пересечение с другими бронированиями
+// Checking for overlap with other bookings
 $checkSql = "SELECT ID FROM reservations 
              WHERE location = ? 
                AND ID != ? 
@@ -76,9 +76,9 @@ if ($result && $result->num_rows > 0) {
 }
 $stmt->close();
 
-// Обработка изображения
+// Image Processing
 $uploadDir = 'uploads/';
-$imageName = $existingImage;  // изначально - имя старого файла
+$imageName = $existingImage;  // initially, the name of the old file
 
 if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
     $tmpPath = $_FILES['image']['tmp_name'];
@@ -86,7 +86,7 @@ if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
     $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
     $baseName = pathinfo($originalName, PATHINFO_FILENAME);
 
-    // Создаем уникальное имя файла
+    // Creating a unique file name
     $finalName = $baseName;
     $counter = 1;
     $destPath = $uploadDir . $finalName . '.' . $ext;
@@ -96,7 +96,7 @@ if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
     }
 
     if (move_uploaded_file($tmpPath, $destPath)) {
-        // Удаляем старый файл, если он существует, не является плейсхолдером и отличается от нового файла
+        // Deleting the old file, if it exists, is not a placeholder and differs from the new file.
         if (
             $existingImage &&
             $existingImage !== 'placeholder.jpg' &&
@@ -107,7 +107,7 @@ if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
                 unlink($oldPath);
             }
         }
-        // Обновляем имя картинки для записи в базу
+        // Updating the name of the image to be recorded in the database
         $imageName = basename($destPath);
     } else {
         http_response_code(500);
@@ -117,7 +117,7 @@ if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
 }
 
 
-// Обновление записи
+// Updating the record
 $updateSql = "UPDATE reservations 
               SET location = ?, start_time = ?, end_time = ?, complete = ?, image_name = ?
               WHERE ID = ?";
