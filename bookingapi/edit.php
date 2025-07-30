@@ -36,7 +36,8 @@ $location = trim($_POST['location'] ?? '');
 $start_time = trim($_POST['start_time'] ?? '');
 $end_time = trim($_POST['end_time'] ?? '');
 $complete = (isset($_POST['complete']) && ($_POST['complete'] == '1' || $_POST['complete'] === 1)) ? 1 : 0;
-$existingImage = trim($_POST['existingImage'] ?? 'placeholder.jpg');
+$existingImage = mysqli_real_escape_string($con, trim($_POST['existingImage'] ?? 'placeholder.jpg'));
+$imageName = $existingImage;
 $originalImageName = mysqli_real_escape_string($con, $_POST['oldImageName'] ?? '');
 $imageName = $originalImageName;
 
@@ -77,30 +78,36 @@ $stmt->close();
 
 // Обработка изображения
 $uploadDir = 'uploads/';
-$imageName = $existingImage;
+$imageName = $existingImage;  // изначально - имя старого файла
 
 if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
     $tmpPath = $_FILES['image']['tmp_name'];
     $originalName = $_FILES['image']['name'];
     $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
     $baseName = pathinfo($originalName, PATHINFO_FILENAME);
+
+    // Создаем уникальное имя файла
     $finalName = $baseName;
     $counter = 1;
     $destPath = $uploadDir . $finalName . '.' . $ext;
-
     while (file_exists($destPath)) {
         $finalName = $baseName . '_' . $counter++;
         $destPath = $uploadDir . $finalName . '.' . $ext;
     }
 
     if (move_uploaded_file($tmpPath, $destPath)) {
-        // Удаление старого изображения
-        if ($existingImage && $existingImage !== 'placeholder.jpg' && $existingImage !== basename($destPath)) {
+        // Удаляем старый файл, если он существует, не является плейсхолдером и отличается от нового файла
+        if (
+            $existingImage &&
+            $existingImage !== 'placeholder.jpg' &&
+            $existingImage !== basename($destPath)
+        ) {
             $oldPath = $uploadDir . $existingImage;
             if (file_exists($oldPath)) {
                 unlink($oldPath);
             }
         }
+        // Обновляем имя картинки для записи в базу
         $imageName = basename($destPath);
     } else {
         http_response_code(500);
@@ -108,6 +115,7 @@ if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         exit;
     }
 }
+
 
 // Обновление записи
 $updateSql = "UPDATE reservations 
