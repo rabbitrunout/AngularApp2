@@ -39,12 +39,13 @@
     <div *ngIf="waitTime > 0" class="alert alert-danger mt-3 text-center">
       Слишком много неудачных попыток.<br />Попробуйте снова через <strong>{{ waitTime }}</strong> сек.
     </div>
+
     <div *ngIf="waitTime > 0" class="progress-bar-container">
-  <div
-    class="progress-bar"
-    [style.width.%]="100 * (300 - waitTime) / 300"
-  ></div>
-</div>
+      <div
+        class="progress-bar"
+        [style.width.%]="100 * (300 - waitTime) / 300"
+      ></div>
+    </div>
 
     <div *ngIf="errorMessage && waitTime <= 0" class="alert alert-danger mt-3 text-center">
       {{ errorMessage }}

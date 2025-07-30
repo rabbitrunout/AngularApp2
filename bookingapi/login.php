@@ -3,6 +3,7 @@ date_default_timezone_set('America/Toronto');
 session_start();
 
 header('Access-Control-Allow-Origin: http://localhost:4200');
+header('Access-Control-Allow-Credentials: true');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 header('Content-Type: application/json');
@@ -29,87 +30,68 @@ $query->bind_param("s", $username);
 $query->execute();
 $result = $query->get_result();
 
-if ($result->num_rows === 1) {
-    $user = $result->fetch_assoc();
+if ($result->num_rows !== 1) {
+    echo json_encode(['success' => false, 'message' => 'User not found']);
+    exit;
+}
 
-    $failedAttempts = (int)$user['failed_attempts'];
-    $lastFailed = $user['last_failed_login'];
+$user = $result->fetch_assoc();
 
-   if ($failedAttempts >= 3 && $lastFailed) {
-    $lastFailedTime = strtotime($lastFailed);
-    $currentTime = time();
-    $timeDiff = $currentTime - $lastFailedTime;
-    
-    // DEBUG:
-    error_log("lastFailedTime: $lastFailedTime; currentTime: $currentTime; timeDiff: $timeDiff");
-    
-    if ($timeDiff < 300) {
-        $remaining = 300 - $timeDiff;
+$failedAttempts = (int)$user['failed_attempts'];
+$lastFailed = $user['last_failed_login'] ? strtotime($user['last_failed_login']) : null;
+$currentTime = time();
+
+// Проверка блокировки
+if ($failedAttempts >= 3 && $lastFailed !== null) {
+    $diff = $currentTime - $lastFailed;
+    if ($diff < 300) {
+        $remaining = 300 - $diff;
         echo json_encode([
             'success' => false,
-            'message' => "Слишком много неудачных попыток. Подождите {$remaining} сек.",
+            'message' => "Слишком много неудачных попыток. Подождите {$remaining} секунд.",
             'waitTime' => $remaining
         ]);
         exit;
-    }
-}
-
-
-    if (password_verify($password, $user['password'])) {
-        // успешный вход — сбрасываем счётчик
-        $_SESSION['loggedIn'] = true;
-        $_SESSION['username'] = $username;
-
+    } else {
+        // Сброс блокировки
         $reset = $con->prepare("UPDATE users SET failed_attempts = 0, last_failed_login = NULL WHERE ID = ?");
         $reset->bind_param("i", $user['ID']);
         $reset->execute();
-
-        echo json_encode(['success' => true, 'message' => 'Login successful']);
-    } else {
-        // неудачный вход — увеличиваем счётчик
-        error_log("Failed attempts: $failedAttempts; last failed: $lastFailed");
-
-        $update = $con->prepare("UPDATE users SET failed_attempts = failed_attempts + 1, last_failed_login = NOW() WHERE ID = ?");
-        $update->bind_param("i", $user['ID']);
-        $update->execute();
-
-        // Получаем обновлённые данные, чтобы проверить количество попыток
-        error_log("Time difference: $timeDiff seconds");
-
-        $check = $con->prepare("SELECT failed_attempts, last_failed_login FROM users WHERE ID = ?");
-        $check->bind_param("i", $user['ID']);
-        $check->execute();
-        $resCheck = $check->get_result();
-        $rowCheck = $resCheck->fetch_assoc();
-
-        $failedAttempts = (int)$rowCheck['failed_attempts'];
-        $lastFailed = $rowCheck['last_failed_login'];
-
-        if ($failedAttempts >= 3 && $lastFailed) {
-            $lastFailedTime = strtotime($lastFailed);
-            $currentTime = time();
-            $timeDiff = $currentTime - $lastFailedTime;
-
-            if ($timeDiff < 300) {
-                $remaining = 300 - $timeDiff;
-                echo json_encode([
-                    'success' => false,
-                    'message' => "Слишком много неудачных попыток. Подождите {$remaining} сек.",
-                    'waitTime' => $remaining
-                ]);
-                exit;
-            } else {
-                // Таймаут прошёл, сбросить счётчик
-                $reset = $con->prepare("UPDATE users SET failed_attempts = 0, last_failed_login = NULL WHERE ID = ?");
-                $reset->bind_param("i", $user['ID']);
-                $reset->execute();
-            }
-        }
-
-        // Если блокировки нет, просто вернуть ошибку
-        echo json_encode(['success' => false, 'message' => 'Invalid password']);
+        $failedAttempts = 0;
     }
+}
+
+// Проверка пароля
+if (password_verify($password, $user['password'])) {
+    $_SESSION['loggedIn'] = true;
+    $_SESSION['userID'] = $user['ID'];
+    $_SESSION['userName'] = $user['userName'];
+
+    $reset = $con->prepare("UPDATE users SET failed_attempts = 0, last_failed_login = NULL WHERE ID = ?");
+    $reset->bind_param("i", $user['ID']);
+    $reset->execute();
+
+    echo json_encode(['success' => true, 'message' => 'Login successful']);
 } else {
-    echo json_encode(['success' => false, 'message' => 'User not found']);
+    $update = $con->prepare("UPDATE users SET failed_attempts = failed_attempts + 1, last_failed_login = NOW() WHERE ID = ?");
+    $update->bind_param("i", $user['ID']);
+    $update->execute();
+
+    $failedAttempts++;
+    $remainingAttempts = max(0, 3 - $failedAttempts);
+
+    if ($remainingAttempts === 0) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Слишком много неудачных попыток. Подождите 300 секунд.',
+            'waitTime' => 300
+        ]);
+    } else {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Неверный пароль.',
+            'remainingAttempts' => $remainingAttempts
+        ]);
+    }
 }
 ?>
