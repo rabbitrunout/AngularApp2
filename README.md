@@ -1,4 +1,4 @@
-# AngularApp2
+# Booking App
 
 Angular Development Assignment 2 – Bookinsystem with Database
 
