@@ -6,33 +6,26 @@ Angular Development Assignment 2 – Booking System with Database
 
 ## 📸 Application Preview
 
-### 🔹 Booking List Page
+[Booking]     [Add]
+[Edit]        [Login]
+
+## Key Features
+
+- Full CRUD functionality
+- Secure file upload validation
+- Account lockout after 3 failed attempts
+- Role-based UI status display
+- Form validation with error handling
+
 <p align="center">
-  <img src="1.png" width="400"/>
+  <img src="1.png" width="45%" />
+  <img src="2.png" width="45%" />
 </p>
 
----
-
-### 🔹 Add Reservation Form
 <p align="center">
-  <img src="2.png" width="400"/>
+  <img src="3.png" width="45%" />
+  <img src="5.png" width="45%" />
 </p>
-
----
-
-### 🔹 Edit Reservation Page
-<p align="center">
-  <img src="3.png" width="400"/>
-</p>
-
----
-
-### 🔹 Login Page
-<p align="center">
-  <img src="5.png" width="400"/>
-</p>
-
----
 
 ## 🛠 Tech Stack
 
