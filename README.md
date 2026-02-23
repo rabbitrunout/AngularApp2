@@ -7,7 +7,12 @@ Angular Development Assignment 2 – Booking System with Database
 ## 📸 Application Preview
 
 ### 🔹 Booking List Page
-![Booking List](1.png)
+![Booking List](<p align="center">
+  <img src="1.png" width="700"/>
+</p>)
+
+
+
 
 ---
 
