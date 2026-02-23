@@ -12,22 +12,17 @@ Angular Development Assignment 2 – Booking System with Database
 ---
 
 ### 🔹 Add Reservation Form
-![Add Reservation](assets/screenshots/add-form.png)
+![Add Reservation](2.png)
 
 ---
 
 ### 🔹 Edit Reservation Page
-![Edit Reservation](assets/screenshots/edit-form.png)
+![Edit Reservation](3.png)
 
 ---
 
 ### 🔹 Login Page
-![Login](assets/screenshots/login.png)
-
----
-
-### 🔹 Status Display (Done / Pending)
-![Status Display](assets/screenshots/status.png)
+![Login](5.png)
 
 ---
 
