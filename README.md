@@ -7,27 +7,30 @@ Angular Development Assignment 2 – Booking System with Database
 ## 📸 Application Preview
 
 ### 🔹 Booking List Page
-![Booking List]<p align="center">
+<p align="center">
   <img src="1.png" width="600"/>
 </p>
-
-
-
 
 ---
 
 ### 🔹 Add Reservation Form
-![Add Reservation](2.png)
+<p align="center">
+  <img src="2.png" width="600"/>
+</p>
 
 ---
 
 ### 🔹 Edit Reservation Page
-![Edit Reservation](3.png)
+<p align="center">
+  <img src="3.png" width="600"/>
+</p>
 
 ---
 
 ### 🔹 Login Page
-![Login](5.png)
+<p align="center">
+  <img src="5.png" width="600"/>
+</p>
 
 ---
 
