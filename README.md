@@ -1,21 +1,24 @@
 # Booking App
 
-Angular Development Assignment 2 – Booking System with Database
+Full-Stack Booking Management System  
+Angular · PHP · MySQL · REST API
+
+A reservation management system with authentication, secure file uploads, role-based status handling, and full CRUD functionality.
+
+---
+
+## 🚀 Key Features
+
+- Full CRUD operations (Create, Read, Update, Delete)
+- Secure image upload with validation and duplicate prevention
+- Account lockout after 3 failed login attempts
+- Role-based status display (Done / Pending)
+- Form validation with clear error handling
+- RESTful backend integration
 
 ---
 
 ## 📸 Application Preview
-
-[Booking]     [Add]
-[Edit]        [Login]
-
-## Key Features
-
-- Full CRUD functionality
-- Secure file upload validation
-- Account lockout after 3 failed attempts
-- Role-based UI status display
-- Form validation with error handling
 
 <p align="center">
   <img src="1.png" width="45%" />
@@ -26,6 +29,18 @@ Angular Development Assignment 2 – Booking System with Database
   <img src="3.png" width="45%" />
   <img src="5.png" width="45%" />
 </p>
+
+---
+
+## 🏗 Architecture Overview
+
+**Frontend:** Angular (SPA)  
+**Backend:** PHP REST API  
+**Database:** MySQL  
+**Authentication:** Session-based login with lockout logic  
+**File Storage:** Server-side uploads with validation  
+
+---
 
 ## 🛠 Tech Stack
 
@@ -40,4 +55,14 @@ Angular Development Assignment 2 – Booking System with Database
 
 ---
 
-## ✅ Booking App Testing Report
+## ✅ Testing
+
+Comprehensive functional and validation testing performed, including:
+
+- CRUD workflow validation
+- File upload security checks
+- Duplicate prevention testing
+- Account lockout verification
+- UI state validation
+
+(See detailed testing report below)
